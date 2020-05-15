@@ -62,6 +62,9 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 #if($column.javaField == 'createTime')
         ${className}.setCreateTime(DateUtils.getNowDate());
 #end
+#if($column.javaField == 'createBy')
+        ${className}.setCreateBy(SecurityUtils.getUsername());
+#end
 #end
         return ${className}Mapper.insert${ClassName}(${className});
     }
@@ -78,6 +81,9 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service
 #foreach ($column in $columns)
 #if($column.javaField == 'updateTime')
         ${className}.setUpdateTime(DateUtils.getNowDate());
+#end
+#if($column.javaField == 'updateBy')
+        ${className}.setUpdateBy(SecurityUtils.getUsername());
 #end
 #end
         return ${className}Mapper.update${ClassName}(${className});
