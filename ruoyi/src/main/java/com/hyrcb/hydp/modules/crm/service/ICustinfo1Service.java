@@ -1,6 +1,9 @@
 package com.hyrcb.hydp.modules.crm.service;
 
 import com.hyrcb.hydp.modules.crm.domain.Custinfo1;
+
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -10,5 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @date 2020-05-20
  */
 public interface ICustinfo1Service extends IService<Custinfo1> {
+	
+	public List<Custinfo1> selectCustInfoList();
 
 }

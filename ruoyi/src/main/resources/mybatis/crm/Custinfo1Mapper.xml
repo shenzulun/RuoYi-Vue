@@ -18,5 +18,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
+    <select id="selectCustInfoList" parameterType="Custinfo1" resultMap="Custinfo1Result">
+        select id, cust_no, cust_name, cert_type, cert_no, tel_no, address, create_by, update_by, create_time, update_time from crm_custinfo
+    </select>
+
 
 </mapper>
