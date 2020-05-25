@@ -4,9 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 import java.util.List;
 import java.util.Arrays;
-
 import com.ruoyi.common.utils.StringUtils;
-import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,12 +33,13 @@ import com.ruoyi.framework.web.page.TableDataInfo;
  * @author ${author}
  * @date ${datetime}
  */
-@AllArgsConstructor
+
 @RestController
 @RequestMapping("/${moduleName}/${businessName}" )
 public class ${ClassName}Controller extends BaseController {
 
-    private final I${ClassName}Service i${ClassName}Service;
+    @Autowired
+    private I${ClassName}Service i${ClassName}Service;
 
     /**
      * 查询${functionName}列表
@@ -48,8 +47,7 @@ public class ${ClassName}Controller extends BaseController {
     @PreAuthorize("@ss.hasPermi('${permissionPrefix}:list')")
     @GetMapping("/list")
 #if($table.crud)
-    public TableDataInfo list(${ClassName} ${className})
-    {
+    public TableDataInfo list(${ClassName} ${className}){
         startPage();
         LambdaQueryWrapper<${ClassName}> lqw = new LambdaQueryWrapper<${ClassName}>();
 #foreach($column in $columns)

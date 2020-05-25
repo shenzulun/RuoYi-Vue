@@ -1,6 +1,7 @@
 package com.hyrcb.hydp.modules.crm.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
 import java.util.List;
 import java.util.Arrays;
 import com.ruoyi.common.utils.StringUtils;
@@ -27,13 +28,14 @@ import com.ruoyi.framework.web.page.TableDataInfo;
  * 客户信息查询Controller
  *
  * @author shenzulun
- * @date 2020-05-20
+ * @date 2020-05-25
  */
+
 @RestController
 @RequestMapping("/crm/custinfo1" )
 public class Custinfo1Controller extends BaseController {
 
-	@Autowired
+    @Autowired
     private ICustinfo1Service iCustinfo1Service;
 
     /**
@@ -41,8 +43,7 @@ public class Custinfo1Controller extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('crm:custinfo1:list')")
     @GetMapping("/list")
-    public TableDataInfo list(Custinfo1 custinfo1)
-    {
+    public TableDataInfo list(Custinfo1 custinfo1){
         startPage();
         LambdaQueryWrapper<Custinfo1> lqw = new LambdaQueryWrapper<Custinfo1>();
         if (StringUtils.isNotBlank(custinfo1.getCustNo())){
