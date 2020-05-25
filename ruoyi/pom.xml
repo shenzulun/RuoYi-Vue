@@ -268,7 +268,7 @@
 		<dependency>
 	      <groupId>me.belucky</groupId> 
 	      <artifactId>IEasyTool</artifactId> 
-	      <version>1.0.2</version> 
+	      <version>1.0.6</version> 
 	      <scope>system</scope> 
 	      <systemPath>${project.basedir}/lib/IEasyTool-1.0.6.jar</systemPath> 
 	    </dependency>

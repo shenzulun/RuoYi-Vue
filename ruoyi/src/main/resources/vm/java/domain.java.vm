@@ -1,22 +1,13 @@
 package ${packageName}.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.io.Serializable;
 import java.util.Date;
-#if($table.crud)
-import com.ruoyi.framework.web.domain.BaseEntity;
-#elseif($table.tree)
-import com.ruoyi.framework.web.domain.TreeEntity;
-#end
+
 
 /**
  * ${functionName}对象 ${tableName}
@@ -29,11 +20,7 @@ import com.ruoyi.framework.web.domain.TreeEntity;
 #elseif($table.tree)
 #set($Entity="TreeEntity")
 #end
-@Data
-@ToString
-@EqualsAndHashCode
-@NoArgsConstructor
-@Accessors(chain = true)
+
 @TableName("${tableName}")
 public class ${ClassName} implements Serializable {
 
@@ -64,5 +51,22 @@ private static final long serialVersionUID=1L;
 #else
     private $column.javaType $column.javaField;
 #end
+#end
+
+#foreach ($column in $columns)
+#if($column.javaField.length() > 2 && $column.javaField.substring(1,2).matches("[A-Z]"))
+#set($AttrName=$column.javaField)
+#else
+#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+#end
+    public void set${AttrName}($column.javaType $column.javaField) 
+    {
+        this.$column.javaField = $column.javaField;
+    }
+
+    public $column.javaType get${AttrName}() 
+    {
+        return $column.javaField;
+    }
 #end
 }

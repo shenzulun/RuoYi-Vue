@@ -7,19 +7,19 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import java.io.Serializable;
 import java.util.Date;
-import com.ruoyi.framework.web.domain.BaseEntity;
+
 
 /**
  * 客户信息查询对象 crm_custinfo
  * 
  * @author shenzulun
- * @date 2020-05-20
+ * @date 2020-05-25
  */
 
 @TableName("crm_custinfo")
 public class Custinfo1 implements Serializable {
 
-private static final long serialVersionUID=1L;
+	private static final long serialVersionUID=1L;
 
 
     /** 主键 */
@@ -68,92 +68,103 @@ private static final long serialVersionUID=1L;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
-	public Long getId() {
-		return id;
-	}
+    public void setId(Long id) 
+    {
+        this.id = id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() 
+    {
+        return id;
+    }
+    public void setCustNo(String custNo) 
+    {
+        this.custNo = custNo;
+    }
 
-	public String getCustNo() {
-		return custNo;
-	}
+    public String getCustNo() 
+    {
+        return custNo;
+    }
+    public void setCustName(String custName) 
+    {
+        this.custName = custName;
+    }
 
-	public void setCustNo(String custNo) {
-		this.custNo = custNo;
-	}
+    public String getCustName() 
+    {
+        return custName;
+    }
+    public void setCertType(String certType) 
+    {
+        this.certType = certType;
+    }
 
-	public String getCustName() {
-		return custName;
-	}
+    public String getCertType() 
+    {
+        return certType;
+    }
+    public void setCertNo(String certNo) 
+    {
+        this.certNo = certNo;
+    }
 
-	public void setCustName(String custName) {
-		this.custName = custName;
-	}
+    public String getCertNo() 
+    {
+        return certNo;
+    }
+    public void setTelNo(String telNo) 
+    {
+        this.telNo = telNo;
+    }
 
-	public String getCertType() {
-		return certType;
-	}
+    public String getTelNo() 
+    {
+        return telNo;
+    }
+    public void setAddress(String address) 
+    {
+        this.address = address;
+    }
 
-	public void setCertType(String certType) {
-		this.certType = certType;
-	}
+    public String getAddress() 
+    {
+        return address;
+    }
+    public void setCreateBy(String createBy) 
+    {
+        this.createBy = createBy;
+    }
 
-	public String getCertNo() {
-		return certNo;
-	}
+    public String getCreateBy() 
+    {
+        return createBy;
+    }
+    public void setUpdateBy(String updateBy) 
+    {
+        this.updateBy = updateBy;
+    }
 
-	public void setCertNo(String certNo) {
-		this.certNo = certNo;
-	}
+    public String getUpdateBy() 
+    {
+        return updateBy;
+    }
+    public void setCreateTime(Date createTime) 
+    {
+        this.createTime = createTime;
+    }
 
-	public String getTelNo() {
-		return telNo;
-	}
+    public Date getCreateTime() 
+    {
+        return createTime;
+    }
+    public void setUpdateTime(Date updateTime) 
+    {
+        this.updateTime = updateTime;
+    }
 
-	public void setTelNo(String telNo) {
-		this.telNo = telNo;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public String getCreateBy() {
-		return createBy;
-	}
-
-	public void setCreateBy(String createBy) {
-		this.createBy = createBy;
-	}
-
-	public String getUpdateBy() {
-		return updateBy;
-	}
-
-	public void setUpdateBy(String updateBy) {
-		this.updateBy = updateBy;
-	}
-
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-    
+    public Date getUpdateTime() 
+    {
+        return updateTime;
+    }
 }
