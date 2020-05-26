@@ -31,8 +31,8 @@ server:
 # 日志配置
 logging:
   level:
-    com.ruoyi: debug
-    org.springframework: warn
+    com.ruoyi: info
+    org.springframework: info
 
 # Spring配置
 spring:
