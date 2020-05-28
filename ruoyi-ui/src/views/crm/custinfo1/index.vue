@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
+    
       <el-form-item label="客户号" prop="custNo">
         <el-input
           v-model="queryParams.custNo"
