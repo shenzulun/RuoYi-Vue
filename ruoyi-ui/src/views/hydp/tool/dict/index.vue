@@ -8,7 +8,7 @@
       <el-col :span="8">
         <div class="query-area">
 
-            <el-input placeholder="请输入表名或字段名(中英文都可)" v-model="queryParams.queryValue" class="input-with-select" size="large" @keyup.enter.native="handleQuery">
+            <el-input placeholder="请输入表名/字段名/码值(中英文都可)" v-model="queryParams.queryValue" class="input-with-select" size="large" @keyup.enter.native="handleQuery">
               <!--
               <el-select v-model="queryParams.reserver1" slot="prepend" placeholder="请选择系统类型" clearable filterable size="small">
                 <el-option
@@ -71,7 +71,7 @@
 
     <!-- 表结构明细 -->
     <el-dialog :title="tableDialogTitle" :visible.sync="tableDialogVisible">
-      <el-table :data="tableInfo">
+      <el-table :data="tableInfo" stripe border>
         <el-table-column label="序号" align="center" type="index"/>
         <el-table-column label="列英文名" align="center" prop="columnName" />
         <el-table-column label="列中文名" align="center" prop="columnCnName" />
@@ -82,7 +82,7 @@
 
     <!-- 表字段码值明细 -->
     <el-dialog :title="columnDialogTitle" :visible.sync="columnDialogVisible">
-      <el-table :data="columnInfo">
+      <el-table :data="columnInfo" stripe border>
         <el-table-column label="序号" align="center" type="index"/>
         <el-table-column label="key" align="center" prop="key" />
         <el-table-column label="value" align="center" prop="value" />

@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.hyrcb.hydp.common.config.StaticCode;
 import com.hyrcb.hydp.common.utils.CommonQuery;
+import com.hyrcb.hydp.modules.tool.dataDict.model.ColumnCodeValue;
 import com.hyrcb.hydp.modules.tool.dataDict.model.ColumnInfo;
 import com.hyrcb.hydp.modules.tool.dataDict.model.TableInfo;
 import me.belucky.easytool.util.CacheUtils;
@@ -95,6 +98,23 @@ public class DataDictQuery {
 					}
 				}
 			}
+			
+			//码值查询
+			List<ColumnCodeValue> codeValues = CacheUtils.getCache(StaticCode.DICT_CODE_VALUE_LIST);
+			List<ColumnCodeValue> tmpList3 = CommonQuery.regexQuery(codeValues, queryValue, "value");
+			if(tmpList3 != null) {
+				for(ColumnCodeValue codeValue : tmpList3) {
+					TableInfo tableInfo = tiMap.get(codeValue.getTableName());
+					if(tableInfo != null) {
+						for(ColumnInfo column : tableInfo.getColumns()) {
+							if(codeValue.getColumnName().equals(column.getColumnName())) {
+								columns.add(column);
+							}
+						}
+					}
+				}
+			}
+			
 		}else{
 			columns = CacheUtils.getCache(detailsFullListKey);
 		}
