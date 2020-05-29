@@ -6,6 +6,11 @@ package com.hyrcb.hydp.modules.tool.dataDict.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import com.hyrcb.hydp.common.config.StaticCode;
+
+import me.belucky.easytool.util.CacheUtils;
 
 /**
  * 功能说明: 表字段明细
@@ -55,6 +60,10 @@ public class ColumnInfo {
 	 * 数据类型-前端展示,类似CHAR(16)
 	 */
 	private String dataTypeShow;
+	/**
+	 * 系统名称-前端展示
+	 */
+	private String systemName;
 	
 	public ColumnInfo(){}
 	
@@ -160,6 +169,19 @@ public class ColumnInfo {
 			}
 		}
 		return result;
+	}
+	
+	public String getSystemName() {
+		String name = "";
+		Map<String, String> codeMap = CacheUtils.getCache(StaticCode.DICT_SYSTEM_CODE_MAP);
+		int ind = tableName.indexOf(".");
+		if(ind == -1) {
+			ind = tableName.indexOf("_");
+		}else {
+			ind++;
+		}
+		name = codeMap.get(tableName.substring(0, ind));
+		return name;
 	}
 	
 }

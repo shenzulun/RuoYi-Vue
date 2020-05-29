@@ -4,7 +4,9 @@
  */
 package com.hyrcb.hydp.modules.tool.dataDict.task;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.hyrcb.hydp.common.config.StaticCode;
 import com.hyrcb.hydp.common.core.BeanFactory;
@@ -12,6 +14,8 @@ import com.hyrcb.hydp.modules.tool.dataDict.config.DataDictConfig;
 import com.hyrcb.hydp.modules.tool.dataDict.core.TableIndexBuildTool;
 import me.belucky.easytool.task.AbstractTask;
 import me.belucky.easytool.util.CacheUtils;
+import me.belucky.easytool.util.FileTools;
+import com.hyrcb.hydp.modules.tool.dataDict.model.SystemCode;
 
 
 /**
@@ -42,16 +46,19 @@ public class DataDictCacheInitTask extends AbstractTask{
 		}
 		CacheUtils.putCache(StaticCode.DICT_SCHEMA_MAP, schemaMap);
 		//开始系统分类的缓存初始化
-//		List<SystemCodeDTO> sysList = new ArrayList<SystemCodeDTO>();
-//		String datafilePath = prop.get("datafile_path"); 
-//		List<String> lines = FileTools.getContentList(datafilePath + "system-codes.txt",true, StaticCode.DEFAULT_FILE_ENCODE);
-//		if(lines != null && lines.size() != 0){
-//			for(String line : lines) {
-//				String[] arr = line.split("\\|");
-//				sysList.add(new SystemCodeDTO(arr[0],arr[1]));
-//			}
-//		}
-//		CacheUtils.putCache(StaticCode.DICT_SYSTEM_CODE, sysList);
+		List<SystemCode> sysList = new ArrayList<SystemCode>();
+		Map<String, String> codeMap = new HashMap<>();
+		String datafilePath = dictConfig.getDatafilePath();
+		List<String> lines = FileTools.getContentList(datafilePath + "system-codes.txt",true, StaticCode.DEFAULT_FILE_ENCODE);
+		if(lines != null && lines.size() != 0){
+			for(String line : lines) {
+				String[] arr = line.split("\\|");
+				sysList.add(new SystemCode(arr[0],arr[1]));
+				codeMap.put(arr[0], arr[1]);
+			}
+		}
+		CacheUtils.putCache(StaticCode.DICT_SYSTEM_CODE, sysList);
+		CacheUtils.putCache(StaticCode.DICT_SYSTEM_CODE_MAP, codeMap);
 		log.info("数仓数据字典索引建立成功");
 	}
 

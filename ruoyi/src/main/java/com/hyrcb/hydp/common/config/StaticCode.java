@@ -26,6 +26,10 @@
  	 */
  	public static final String DICT_SYSTEM_CODE = "dict_system_code";
  	/**
+	  *  数据字典的系统代码定义
+	 */
+	public static final String DICT_SYSTEM_CODE_MAP = "dict_system_code_map";
+ 	/**
 	  *  字段码值的系统代码定义
 	 */
 	public static final String DICT_CODE_VALUE_LIST = "dict_code_value_list";

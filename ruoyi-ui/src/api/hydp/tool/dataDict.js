@@ -16,3 +16,10 @@ export function getDataDict(tableName) {
     method: 'get'
   })
 }
+
+export function getSystemCode() {
+  return request({
+    url: '/tool/dict/code',
+    method: 'get'
+  })
+}
