@@ -5,7 +5,9 @@
 package com.hyrcb.hydp.modules.tool.dataDict.controller;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.hyrcb.hydp.common.config.StaticCode;
@@ -17,6 +19,7 @@ import me.belucky.easytool.util.CacheUtils;
 import com.hyrcb.hydp.modules.tool.dataDict.core.DataDictQuery;
 import com.hyrcb.hydp.modules.tool.dataDict.model.ColumnInfo;
 import com.hyrcb.hydp.modules.tool.dataDict.model.SystemCode;
+import com.hyrcb.hydp.modules.tool.dataDict.model.TableInfo;
 
 /**
  * Description: 数据字典的路由控制类
@@ -25,10 +28,14 @@ import com.hyrcb.hydp.modules.tool.dataDict.model.SystemCode;
  * @version 1.0
  */
 @RestController
-@RequestMapping("/tool/dict" )
+@RequestMapping("/tool/dataDict" )
 public class DataDictController extends BaseController{
-
 	
+	/**
+	 * 查询数据字典清单
+	 * @param commonSearchDTO
+	 * @return
+	 */
 //	@PreAuthorize("@ss.hasPermi('tool:dict:list')")
 	@RequestMapping("/list")
 	public TableDataInfo list(CommonSearchDTO commonSearchDTO){
@@ -39,9 +46,44 @@ public class DataDictController extends BaseController{
 		return getDataTable(columns);
 	}
 	
+	/**
+	 * 查询系统分类清单
+	 * @return
+	 */
 	@RequestMapping("/code")
     public AjaxResult getSystemCode() {
 		List<SystemCode> list = CacheUtils.getCache(StaticCode.DICT_SYSTEM_CODE);
         return AjaxResult.success(list);
     }
+	
+	/**
+	 * 获取表的详细信息
+	 * @param tableName
+	 * @return
+	 */
+	@RequestMapping(value = "/{tableName}")
+	public AjaxResult getTableInfo(@PathVariable("tableName" ) String tableName) {
+		//获取表信息
+		TableInfo tab = new TableInfo();
+		Map<String, TableInfo> tableInfoMap = CacheUtils.getCache(StaticCode.CACHE_PREFIX_DATA_STORAGE + "_tab_full_map");
+		TableInfo tabInfo = tableInfoMap.get(tableName);
+		if(tabInfo != null){
+			tab = tabInfo;
+		}
+		return AjaxResult.success(tab);
+	}
+	
+	/**
+	 * 查询表字段的码值
+	 * @param columnInfo
+	 * @return
+	 */
+	@RequestMapping("/column")
+	public AjaxResult getColumnCode(ColumnInfo columnInfo) {
+		ColumnInfo column = DataDictQuery.getColumnInfo(columnInfo.getTableName(), columnInfo.getColumnName(), StaticCode.CACHE_PREFIX_DATA_STORAGE);
+		if(column == null) {
+			column = new ColumnInfo();
+		}
+		return AjaxResult.success(column);
+	}
 }
