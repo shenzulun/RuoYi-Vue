@@ -21,6 +21,8 @@ import com.hyrcb.hydp.modules.crm.service.ICustinfo1Service;
 
 import me.belucky.easytool.random.IdCard;
 import me.belucky.easytool.random.IdCardRandom;
+import me.belucky.easytool.random.NameRandom;
+import me.belucky.easytool.util.IDCardGenerateUtil;
 
 /**
  * Description: 
@@ -39,25 +41,25 @@ public class CommonTest {
 	@Autowired
     private ICustinfo1Service iCustinfo1Service;
 	
-	@Test
+//	@Test
 	public void testSelect() {
 		List<Custinfo1> result = iCustinfo1Service.selectCustInfoList();
 		System.out.println(result.size());
 	}
 	
 	
-//	@Test
+	@Test
 	public void testSaveBatch() {
 		List<Custinfo1> list = Lists.newArrayList();
-		int total = 1000000;
+		int total = 100000;
 		for(int i=0;i<total;i++) {
 			Custinfo1 c = new Custinfo1();
 			int seq = total + i;
 			c.setCustNo("130" + seq);
-			IdCard idcard = IdCardRandom.randOneUnFair();
-			c.setCustName(idcard.getName());
+//			IdCard idcard = IdCardRandom.randOne();
+			c.setCustName(NameRandom.randFamilyName() + NameRandom.randNameUnFair());
 			c.setCertType("101");
-			c.setCertNo(idcard.getCertno());
+			c.setCertNo(IDCardGenerateUtil.random());
 			c.setCreateTime(new Date());
 			c.setCreateBy("admin");
 			
