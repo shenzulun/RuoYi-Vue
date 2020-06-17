@@ -10,13 +10,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 
+import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure;
+
 /**
  * Description: 启动入口
  * @author shenzulun
  * @date 2020-05-14
  * @version 1.0
  */
-@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
+@SpringBootApplication(exclude = { DruidDataSourceAutoConfigure.class })
 public class LaunchEntry {
     private static final Logger log = LoggerFactory.getLogger(LaunchEntry.class);
 
