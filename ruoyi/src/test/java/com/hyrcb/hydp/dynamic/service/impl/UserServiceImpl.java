@@ -18,7 +18,7 @@ import com.hyrcb.hydp.dynamic.service.UserService;
  * @version 1.0
  */
 @Service
-@DS("slave_1")
+@DS("slave1")
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService{
 
 }

@@ -46,6 +46,7 @@ public class SysLoginService
      */
     public String login(String username, String password, String code, String uuid)
     {
+    	/** shenzl-20200706-去除验证码
         String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
         String captcha = redisCache.getCacheObject(verifyKey);
         redisCache.deleteObject(verifyKey);
@@ -59,6 +60,7 @@ public class SysLoginService
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
             throw new CaptchaException();
         }
+        */
         // 用户验证
         Authentication authentication = null;
         try

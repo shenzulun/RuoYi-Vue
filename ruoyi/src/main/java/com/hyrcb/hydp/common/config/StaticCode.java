@@ -61,4 +61,6 @@
  	 * 默认的文件字符集
  	 */
  	public static final String DEFAULT_FILE_ENCODE = "UTF-8";
+ 	
+ 	public static final int MAX_IN_PARAMS = 500;
  }

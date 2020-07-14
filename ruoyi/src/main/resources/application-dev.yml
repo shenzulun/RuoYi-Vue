@@ -45,7 +45,16 @@ spring:
                     url: jdbc:mysql://localhost:3306/hydp1?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
                     druid: # 以下参数针对每个库可以重新设置druid参数
                         validation-query: select 1
-                slave_1:
+                slave1:
+                    username: sa
+                    password: ""
+                    driver-class-name: org.h2.Driver
+                    url: jdbc:h2:mem:test
+                    schema: classpath:db/schema-demo.sql
+                    data: classpath:db/data-demo.sql
+                    druid: # 以下参数针对每个库可以重新设置druid参数
+                        validation-query: select 1
+                slave2:
                     username: sa
                     password: ""
                     driver-class-name: org.h2.Driver

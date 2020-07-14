@@ -16,7 +16,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 // 表示通过aop框架暴露该代理对象,AopContext能够访问
 @EnableAspectJAutoProxy(exposeProxy = true)
 // 指定要扫描的Mapper类的包的路径
-@MapperScan(basePackages= {"com.ruoyi.project.**.mapper","com.hyrcb.hydp.modules.**.mapper","com.hyrcb.hydp.dynamic.mapper"})
+@MapperScan(basePackages= {"com.ruoyi.project.**.mapper","com.hyrcb.hydp.modules.**.mapper","com.hyrcb.hydp.dynamic.mapper","com.hyrcb.hydp.common.db"})
 public class ApplicationConfig
 {
     /**

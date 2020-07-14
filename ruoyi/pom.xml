@@ -8,7 +8,7 @@
 	<version>2.3.0</version>
 	<packaging>jar</packaging>
 
-	<name>ruoyi</name>
+	<name>devp-server</name>
 	<url>http://www.ruoyi.vip</url>
 	<description>若依管理系统</description>
 
@@ -112,6 +112,15 @@
             <artifactId>h2</artifactId>
             <version>1.4.200</version>
        </dependency>
+       
+       <!-- DB2驱动包 -->
+       <dependency>
+	      <groupId>com.ibm.db2.jcc</groupId> 
+	      <artifactId>db2jcc4</artifactId> 
+	      <version>10.1</version> 
+	      <scope>system</scope> 
+	      <systemPath>${project.basedir}/lib/db2jcc4.jar</systemPath> 
+	    </dependency>
 
 		<!-- pagehelper 分页插件 -->
 		<dependency>
@@ -292,6 +301,14 @@
 	      <scope>system</scope> 
 	      <systemPath>${project.basedir}/lib/IEasyTool-1.0.6.jar</systemPath> 
 	    </dependency>
+	    
+	    <dependency>
+	      <groupId>com.jfinal</groupId> 
+	      <artifactId>jfinal</artifactId> 
+	      <version>4.7</version> 
+	      <scope>system</scope> 
+	      <systemPath>${project.basedir}/lib/jfinal-4.7.jar</systemPath> 
+	    </dependency>
 		
 		<!-- 工作流 -->
 		<!-- 
@@ -324,6 +341,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<fork>true</fork> <!-- 如果没有该配置，devtools不会生效 -->
+					<includeSystemScope>true</includeSystemScope>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -47,7 +47,7 @@ public class IpUtils
     public static boolean internalIp(String ip)
     {
         byte[] addr = textToNumericFormatV4(ip);
-        return internalIp(addr) || "127.0.0.1".equals(ip);
+        return internalIp(addr) || "127.0.0.1".equals(ip) || ip.startsWith("154.183");
     }
 
     private static boolean internalIp(byte[] addr)
