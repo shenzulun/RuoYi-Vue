@@ -26,7 +26,7 @@ export default {
   },
   data() {
     return {
-      title: '数据综合平台',
+      title: '数据中台',
       logo: logoImg
     }
   }
