@@ -182,4 +182,10 @@ public class SysConfigServiceImpl implements ISysConfigService
     {
         return Constants.SYS_CONFIG_KEY + configKey;
     }
+
+	public SysConfig selectConfigByKey0(String configKey) {
+		SysConfig config = new SysConfig();
+        config.setConfigKey(configKey);
+        return configMapper.selectConfig(config);
+	}
 }

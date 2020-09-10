@@ -17,6 +17,13 @@ public interface ISysConfigService
      * @return 参数配置信息
      */
     public SysConfig selectConfigById(Long configId);
+    
+    /**
+     * 查询参数配置
+     * @param configKey
+     * @return
+     */
+    public SysConfig selectConfigByKey0(String configKey);
 
     /**
      * 根据键名查询参数配置信息

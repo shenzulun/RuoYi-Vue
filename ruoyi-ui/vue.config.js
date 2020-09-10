@@ -6,7 +6,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || '数据中台' // 标题
+const name = defaultSettings.title || '人行三色图' // 标题
 
 const port = process.env.port || process.env.npm_config_port || 80 // 端口
 
@@ -48,6 +48,10 @@ module.exports = {
       alias: {
         '@': resolve('src')
       }
+    },
+    externals:{
+      'BMap': 'BMap',
+      'BMap_Symbol_SHAPE_POINT':'BMap_Symbol_SHAPE_POINT'
     }
   },
   chainWebpack(config) {

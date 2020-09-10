@@ -26,7 +26,7 @@ export default {
   },
   data() {
     return {
-      title: '数据中台',
+      title: '人行三色图',
       logo: logoImg
     }
   }

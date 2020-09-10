@@ -14,8 +14,9 @@
     },
     created() {
         let p = this.$route.path;
+        console.log(p);
         //TODO 目前设置路由时,如果HTTP开头会被自动当成外链跳转
-        p = 'http://' + p.substring(p.lastIndexOf('/') + 1);
+        p = 'http://' + p.substring(p.lastIndexOf('@') + 1);
         console.log(p);
         this.src = p;
     },

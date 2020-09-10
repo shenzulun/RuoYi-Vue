@@ -117,6 +117,26 @@ export const constantRoutes = [
         meta: { title: '修改生成配置' }
       }
     ]
+  },
+  {
+    path: '/report',
+    component: (resolve) => require(['@/views/hydp/rh/report'], resolve),
+    hidden: true
+  },
+  {
+    path: '/report1',
+    component: (resolve) => require(['@/views/hydp/rh/report1'], resolve),
+    hidden: true
+  },
+  {
+    path: '/map1',
+    component: (resolve) => require(['@/views/hydp/rh/report/map1'], resolve),
+    hidden: true
+  },
+  {
+    path: '/dp',
+    component: (resolve) => require(['@/views/pbc/datav'], resolve),
+    hidden: true
   }
 ]
 

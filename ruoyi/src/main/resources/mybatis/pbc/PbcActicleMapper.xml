@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyrcb.hydp.modules.pbc.mapper.PbcActicleMapper">
+    
+    <resultMap type="PbcActicle" id="PbcActicleResult">
+        <result property="id"    column="id"    />
+        <result property="deptId"    column="dept_id"    />
+        <result property="articleType"    column="article_type"    />
+        <result property="title"    column="title"    />
+        <result property="content"    column="content"    />
+        <result property="accessoryUrl"    column="accessory_url"    />
+        <result property="articleStatus"    column="article_status"    />
+        <result property="status"    column="status"    />
+        <result property="createUser"    column="create_user"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateUser"    column="update_user"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+</mapper>
