@@ -50,7 +50,7 @@
     </el-form>
     <!--  底部  -->
     <div class="el-login-footer">
-      <span>Copyright©2020 open source</span>
+      <span>Copyright © 2018-2019 ruoyi.vip All Rights Reserved.</span>
     </div>
   </div>
 </template>
@@ -67,8 +67,8 @@ export default {
       codeUrl: "",
       cookiePassword: "",
       loginForm: {
-        username: "guest",
-        password: "123456",
+        username: "admin",
+        password: "admin123",
         rememberMe: false,
         code: "",
         uuid: ""
@@ -201,5 +201,8 @@ export default {
   font-family: Arial;
   font-size: 12px;
   letter-spacing: 1px;
+}
+.login-code-img {
+  height: 38px;
 }
 </style>
