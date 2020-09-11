@@ -148,15 +148,27 @@ public class GenController extends BaseController
     }
 
     /**
-     * 生成代码
+     * 生成代码（下载方式）
+     */
+    @PreAuthorize("@ss.hasPermi('tool:gen:code')")
+    @Log(title = "代码生成", businessType = BusinessType.GENCODE)
+    @GetMapping("/download/{tableName}")
+    public void download(HttpServletResponse response, @PathVariable("tableName") String tableName) throws IOException
+    {
+        byte[] data = genTableService.downloadCode(tableName);
+        genCode(response, data);
+    }
+
+    /**
+     * 生成代码（自定义路径）
      */
     @PreAuthorize("@ss.hasPermi('tool:gen:code')")
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
     @GetMapping("/genCode/{tableName}")
-    public void genCode(HttpServletResponse response, @PathVariable("tableName") String tableName) throws IOException
+    public AjaxResult genCode(HttpServletResponse response, @PathVariable("tableName") String tableName)
     {
-        byte[] data = genTableService.generatorCode(tableName);
-        genCode(response, data);
+        genTableService.generatorCode(tableName);
+        return AjaxResult.success();
     }
 
     /**
@@ -168,7 +180,7 @@ public class GenController extends BaseController
     public void batchGenCode(HttpServletResponse response, String tables) throws IOException
     {
         String[] tableNames = Convert.toStrArray(tables);
-        byte[] data = genTableService.generatorCode(tableNames);
+        byte[] data = genTableService.downloadCode(tableNames);
         genCode(response, data);
     }
 
@@ -178,6 +190,8 @@ public class GenController extends BaseController
     private void genCode(HttpServletResponse response, byte[] data) throws IOException
     {
         response.reset();
+        response.addHeader("Access-Control-Allow-Origin", "*");
+        response.addHeader("Access-Control-Expose-Headers", "Content-Disposition");
         response.setHeader("Content-Disposition", "attachment; filename=\"ruoyi.zip\"");
         response.addHeader("Content-Length", "" + data.length);
         response.setContentType("application/octet-stream; charset=UTF-8");
