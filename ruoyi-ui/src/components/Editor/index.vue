@@ -147,7 +147,7 @@ export default {
 <style>
 .editor {
   line-height: normal !important;
-  height: 192px;
+  height: 300px;
 }
 .quill-img {
   display: none;

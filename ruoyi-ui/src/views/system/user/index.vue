@@ -424,6 +424,7 @@ export default {
         password: [
           { required: true, message: "用户密码不能为空", trigger: "blur" }
         ],
+        /**
         phonenumber: [
           { required: true, message: "手机号码不能为空", trigger: "blur" },
           {
@@ -431,7 +432,7 @@ export default {
             message: "请输入正确的手机号码",
             trigger: "blur"
           }
-        ]
+        ]*/
       }
     };
   },

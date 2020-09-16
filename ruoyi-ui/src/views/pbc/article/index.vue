@@ -10,7 +10,16 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      
+      <el-form-item label="信息类型" prop="articleType">
+        <el-select v-model="queryParams.articleType" placeholder="请选择信息类型" clearable size="small">
+          <el-option
+            v-for="dict in articleTypeOptions"
+            :key="dict.dictValue"
+            :label="dict.dictLabel"
+            :value="dict.dictValue"
+          />
+        </el-select>
+      </el-form-item>
       <el-form-item label="标题" prop="title">
         <el-input
           v-model="queryParams.title"
@@ -35,13 +44,56 @@
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="loading" :data="acticleList" stripe border @selection-change="handleSelectionChange">
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          icon="el-icon-plus"
+          size="mini"
+          @click="handleAdd"
+          v-hasPermi="['pbc:article:add']"
+        >新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          icon="el-icon-edit"
+          size="mini"
+          :disabled="single"
+          @click="handleUpdate"
+          v-hasPermi="['pbc:article:edit']"
+        >修改</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          icon="el-icon-delete"
+          size="mini"
+          :disabled="multiple"
+          @click="handleDelete"
+          v-hasPermi="['pbc:article:remove']"
+        >删除</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          icon="el-icon-download"
+          size="mini"
+          @click="handleExport"
+          v-hasPermi="['pbc:article:export']"
+        >导出</el-button>
+      </el-col>
+    </el-row>
+
+    <el-table v-loading="loading" :data="articleList" stripe border @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="主键" align="center" prop="id" v-if="false"/>
+      <el-table-column label="主键" align="center" prop="id" />
       <el-table-column label="所属机构" align="center" prop="deptId" />
       <el-table-column label="信息类型" align="center" prop="articleType" :formatter="articleTypeFormat" />
       <el-table-column label="标题" align="center" prop="title" />
+      <!--
       <el-table-column label="内容" align="center" prop="content" />
+      -->
       <el-table-column label="发布状态" align="center" prop="articleStatus" :formatter="articleStatusFormat" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
@@ -53,6 +105,31 @@
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <template slot-scope="scope">
+            <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-document"
+            @click="handlePreview(scope.row)"
+            v-hasPermi="['pbc:acticle:query']"
+          >预览</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-edit"
+            @click="handleUpdate(scope.row)"
+            v-hasPermi="['pbc:article:edit']"
+          >修改</el-button>
+          <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-delete"
+            @click="handleDelete(scope.row)"
+            v-hasPermi="['pbc:article:remove']"
+          >删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     
     <pagination
@@ -62,14 +139,58 @@
       :limit.sync="queryParams.pageSize"
       @pagination="getList"
     />
+
+    <!-- 添加或修改文章信息对话框 -->
+    <el-dialog :title="title" :visible.sync="open" width="80%" height="60%" append-to-body>
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+        <el-form-item label="所属机构" prop="deptId">
+          <el-input v-model="form.deptId" placeholder="请输入所属机构" />
+        </el-form-item>
+        <el-form-item label="信息类型">
+          <el-select v-model="form.articleType" placeholder="请选择信息类型">
+            <el-option
+              v-for="dict in articleTypeOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="form.title" placeholder="请输入标题" />
+        </el-form-item>
+        <el-form-item label="发布状态">
+            <el-select v-model="form.articleStatus" placeholder="请选择发布状态">
+              <el-option
+                v-for="dict in articleStatusOptions"
+                :key="dict.dictValue"
+                :label="dict.dictLabel"
+                :value="dict.dictValue"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+        <el-form-item label="内容" prop="content">
+            <Editor v-model="form.content" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitForm">确 定</el-button>
+        <el-button @click="cancel">取 消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { listActicle, getActicle, delActicle, addActicle, updateActicle, exportActicle } from "@/api/pbc/acticle";
+import { listArticle, getArticle, delArticle, addArticle, updateArticle, exportArticle } from "@/api/pbc/article";
+import {listDept} from "@/api/system/dept";
+import Editor from '@/components/Editor';
 
 export default {
-  name: "Acticle",
+  name: "Article",
+  components: {
+    Editor
+  },
   data() {
     return {
       // 遮罩层
@@ -83,7 +204,7 @@ export default {
       // 总条数
       total: 0,
       // 文章信息表格数据
-      acticleList: [],
+      articleList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -92,6 +213,8 @@ export default {
       articleTypeOptions: [],
       // 发布状态字典
       articleStatusOptions: [],
+      // 部门字典
+      deptOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -100,7 +223,6 @@ export default {
         articleType: undefined,
         title: undefined,
         content: undefined,
-        articleType: 'SQQD'
       },
       // 表单参数
       form: {},
@@ -122,8 +244,8 @@ export default {
     /** 查询文章信息列表 */
     getList() {
       this.loading = true;
-      listActicle(this.queryParams).then(response => {
-        this.acticleList = response.rows;
+      listArticle(this.queryParams).then(response => {
+        this.articleList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -185,7 +307,7 @@ export default {
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
-      getActicle(id).then(response => {
+      getArticle(id).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改文章信息";
@@ -196,7 +318,7 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != undefined) {
-            updateActicle(this.form).then(response => {
+            updateArticle(this.form).then(response => {
               if (response.code === 200) {
                 this.msgSuccess("修改成功");
                 this.open = false;
@@ -204,7 +326,7 @@ export default {
               }
             });
           } else {
-            addActicle(this.form).then(response => {
+            addArticle(this.form).then(response => {
               if (response.code === 200) {
                 this.msgSuccess("新增成功");
                 this.open = false;
@@ -223,7 +345,7 @@ export default {
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delActicle(ids);
+          return delArticle(ids);
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
@@ -237,11 +359,20 @@ export default {
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return exportActicle(queryParams);
+          return exportArticle(queryParams);
         }).then(response => {
           this.download(response.msg);
         }).catch(function() {});
-    }
+    },
+    /** 预览 **/
+    handlePreview(row) {
+      const id = row.id;
+      let routeData = this.$router.resolve({ 
+          path: '/input/article/preview',
+          query: {id: row.id},
+      });
+      window.open(routeData.href, '_blank');
+    },
   }
 };
 </script>

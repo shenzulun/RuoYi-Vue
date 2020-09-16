@@ -35,13 +35,12 @@
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="loading" :data="acticleList" stripe border @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="ArticleList" stripe border @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="主键" align="center" prop="id" v-if="false"/>
       <el-table-column label="所属机构" align="center" prop="deptId" />
       <el-table-column label="信息类型" align="center" prop="articleType" :formatter="articleTypeFormat" />
       <el-table-column label="标题" align="center" prop="title" />
-      <el-table-column label="内容" align="center" prop="content" />
       <el-table-column label="发布状态" align="center" prop="articleStatus" :formatter="articleStatusFormat" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
@@ -53,6 +52,17 @@
           <span>{{ parseTime(scope.row.updateTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+          <template slot-scope="scope">
+              <el-button
+              size="mini"
+              type="text"
+              icon="el-icon-document"
+              @click="handlePreview(scope.row)"
+              v-hasPermi="['pbc:acticle:query']"
+            >预览</el-button>
+          </template>
+        </el-table-column>
     </el-table>
     
     <pagination
@@ -66,10 +76,10 @@
 </template>
 
 <script>
-import { listActicle, getActicle, delActicle, addActicle, updateActicle, exportActicle } from "@/api/pbc/acticle";
+import { listArticle, getArticle, delArticle, addArticle, updateArticle, exportArticle } from "@/api/pbc/article";
 
 export default {
-  name: "Acticle",
+  name: "Article",
   data() {
     return {
       // 遮罩层
@@ -83,7 +93,7 @@ export default {
       // 总条数
       total: 0,
       // 文章信息表格数据
-      acticleList: [],
+      ArticleList: [],
       // 弹出层标题
       title: "",
       // 是否显示弹出层
@@ -100,7 +110,7 @@ export default {
         articleType: undefined,
         title: undefined,
         content: undefined,
-        articleType: 'SXQD'
+        articleType: 'ZCXX'
       },
       // 表单参数
       form: {},
@@ -122,8 +132,8 @@ export default {
     /** 查询文章信息列表 */
     getList() {
       this.loading = true;
-      listActicle(this.queryParams).then(response => {
-        this.acticleList = response.rows;
+      listArticle(this.queryParams).then(response => {
+        this.ArticleList = response.rows;
         this.total = response.total;
         this.loading = false;
       });
@@ -185,7 +195,7 @@ export default {
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
-      getActicle(id).then(response => {
+      getArticle(id).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改文章信息";
@@ -196,7 +206,7 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.id != undefined) {
-            updateActicle(this.form).then(response => {
+            updateArticle(this.form).then(response => {
               if (response.code === 200) {
                 this.msgSuccess("修改成功");
                 this.open = false;
@@ -204,7 +214,7 @@ export default {
               }
             });
           } else {
-            addActicle(this.form).then(response => {
+            addArticle(this.form).then(response => {
               if (response.code === 200) {
                 this.msgSuccess("新增成功");
                 this.open = false;
@@ -223,7 +233,7 @@ export default {
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return delActicle(ids);
+          return delArticle(ids);
         }).then(() => {
           this.getList();
           this.msgSuccess("删除成功");
@@ -237,11 +247,20 @@ export default {
           cancelButtonText: "取消",
           type: "warning"
         }).then(function() {
-          return exportActicle(queryParams);
+          return exportArticle(queryParams);
         }).then(response => {
           this.download(response.msg);
         }).catch(function() {});
-    }
+    },
+    /** 预览 **/
+    handlePreview(row) {
+      const id = row.id;
+      let routeData = this.$router.resolve({ 
+          path: '/input/article/preview',
+          query: {id: row.id},
+      });
+      window.open(routeData.href, '_blank');
+    },
   }
 };
 </script>

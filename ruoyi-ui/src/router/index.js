@@ -137,6 +137,11 @@ export const constantRoutes = [
     path: '/dp',
     component: (resolve) => require(['@/views/pbc/datav'], resolve),
     hidden: true
+  },
+  {
+    path: '/input/article/preview',
+    component: (resolve) => require(['@/views/pbc/article/preview'], resolve),
+    hidden: true
   }
 ]
 
