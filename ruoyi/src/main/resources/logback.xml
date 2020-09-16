@@ -7,6 +7,7 @@
 
 	<!-- 控制台输出 -->
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<target>System.out</target>
 		<encoder>
 			<pattern>${log.pattern}</pattern>
 		</encoder>
@@ -76,9 +77,19 @@
 	<!-- Spring日志级别控制  -->
 	<logger name="org.springframework" level="warn" />
 
-	<root level="info">
+	<root level="debug">
 		<appender-ref ref="console" />
 	</root>
+	
+	<logger name="com.hyrcb.hydp" additivity="false" level="DEBUG">
+        <appender-ref ref="console" />
+        <appender-ref ref="file_info" />
+        <appender-ref ref="file_error" />
+    </logger>
+    
+    <logger name="druid.sql" level="debug">
+    	<appender-ref ref="console" />
+    </logger>
 	
 	<!--系统操作日志-->
     <root level="info">

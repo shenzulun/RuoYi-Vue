@@ -31,8 +31,9 @@ server:
 # 日志配置
 logging:
   level:
-    com.ruoyi: info
+    com.ruoyi: debug
     org.springframework: warn
+    druid.sql: debug
 
 # Spring配置
 spring:

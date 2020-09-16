@@ -10,14 +10,14 @@ import java.util.Date;
 
 
 /**
- * 文章信息对象 pbc_acticle
+ * 文章信息对象 pbc_article
  * 
  * @author shenzulun
- * @date 2020-09-10
+ * @date 2020-09-11
  */
 
-@TableName("pbc_acticle")
-public class PbcActicle implements Serializable {
+@TableName("pbc_article")
+public class PbcArticle implements Serializable {
 
 private static final long serialVersionUID=1L;
 

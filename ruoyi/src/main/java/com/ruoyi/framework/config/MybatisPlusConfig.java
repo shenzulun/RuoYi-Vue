@@ -7,6 +7,7 @@ package com.ruoyi.framework.config;
 import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.SqlExplainInterceptor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -43,5 +44,11 @@ public class MybatisPlusConfig {
 	@Bean
 	public SqlExplainInterceptor sqlExplainInterceptor() {
 		return new SqlExplainInterceptor();
+	}
+	
+	@Bean
+	@ConditionalOnMissingBean
+	public MybatisDataAuthInterceptor mybatisDataAuthInterceptor() {
+		return new MybatisDataAuthInterceptor();
 	}
 }
