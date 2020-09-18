@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
  * @version 1.0
  */
 @Configuration
-@ConfigurationProperties(prefix = "spring.datasource.dynamic.datasource.slave2")
+@ConfigurationProperties(prefix = "spring.datasource.dynamic.datasource.master")
 public class DbProperties {
 	
 //	@Value("${spring.datasource.dynamic.datasource.slave_db2_101.username}")

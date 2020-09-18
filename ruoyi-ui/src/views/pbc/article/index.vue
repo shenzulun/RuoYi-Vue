@@ -1,15 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-      <el-form-item label="所属机构" prop="deptId">
-        <el-input
-          v-model="queryParams.deptId"
-          placeholder="请输入所属机构"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="信息类型" prop="articleType">
         <el-select v-model="queryParams.articleType" placeholder="请选择信息类型" clearable size="small">
           <el-option
@@ -88,13 +79,15 @@
     <el-table v-loading="loading" :data="articleList" stripe border @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="主键" align="center" prop="id" />
-      <el-table-column label="所属机构" align="center" prop="deptId" />
+      <el-table-column label="所属机构" align="center" prop="deptName"/>
       <el-table-column label="信息类型" align="center" prop="articleType" :formatter="articleTypeFormat" />
       <el-table-column label="标题" align="center" prop="title" />
       <!--
       <el-table-column label="内容" align="center" prop="content" />
       -->
       <el-table-column label="发布状态" align="center" prop="articleStatus" :formatter="articleStatusFormat" />
+      <el-table-column label="是否PDF" align="center" prop="isPdf" v-if="false"/>
+      <el-table-column label="附件URL" align="center" prop="accessoryUrl" v-if="false"/>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -112,7 +105,6 @@
             type="text"
             icon="el-icon-document"
             @click="handlePreview(scope.row)"
-            v-hasPermi="['pbc:acticle:query']"
           >预览</el-button>
           <el-button
             size="mini"
@@ -140,12 +132,9 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改文章信息对话框 -->
+    <!-- 添加或修改发文信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="80%" height="60%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="所属机构" prop="deptId">
-          <el-input v-model="form.deptId" placeholder="请输入所属机构" />
-        </el-form-item>
         <el-form-item label="信息类型">
           <el-select v-model="form.articleType" placeholder="请选择信息类型">
             <el-option
@@ -156,21 +145,52 @@
             ></el-option>
           </el-select>
         </el-form-item>
+        <el-form-item label="发布状态">
+          <el-select v-model="form.articleStatus" placeholder="请选择发布状态">
+            <el-option
+              v-for="dict in articleStatusOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            ></el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入标题" />
-        </el-form-item>
-        <el-form-item label="发布状态">
-            <el-select v-model="form.articleStatus" placeholder="请选择发布状态">
+        </el-form-item>  
+        <el-form-item label="是否PDF" prop="isPdf">
+            <el-select v-model="form.isPdf" placeholder="请选择是否PDF" @change="isPdfOnChange">
               <el-option
-                v-for="dict in articleStatusOptions"
+                v-for="dict in yesOrNotOptions"
                 :key="dict.dictValue"
                 :label="dict.dictLabel"
                 :value="dict.dictValue"
               ></el-option>
             </el-select>
-          </el-form-item>
-        <el-form-item label="内容" prop="content">
+        </el-form-item>
+        <el-form-item label="内容" prop="content" v-show="form.isPdf != '1'">
             <Editor v-model="form.content" />
+        </el-form-item>
+        <el-form-item label="PDF上传" prop="accessoryUrl" v-show="form.isPdf == '1'">
+            <el-upload
+              class="avatar-uploader"
+              :action="uploadUrl"
+              :headers="headers"
+              :on-preview="handleOnPreview"
+              :on-remove="handleRemove"
+              :before-remove="beforeRemove"
+              :before-upload="handleUploadBefore"
+              multiple
+              accept=".pdf"
+              :limit="1"
+              :on-success="handleUploadSuccess"
+              :on-error="handleUploadError"
+              :on-exceed="handleExceed"
+              :file-list="fileList">
+              <el-button size="small" type="primary">点击上传</el-button>
+              <div slot="tip" class="el-upload__tip">只能上传pdf文件</div>
+            </el-upload>
+            <el-input v-model="form.accessoryUrl" v-show="false" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -183,8 +203,9 @@
 
 <script>
 import { listArticle, getArticle, delArticle, addArticle, updateArticle, exportArticle } from "@/api/pbc/article";
-import {listDept} from "@/api/system/dept";
+import {listDept, listDeptAsync, getDept} from "@/api/system/dept";
 import Editor from '@/components/Editor';
+import { getToken } from '@/utils/auth'
 
 export default {
   name: "Article",
@@ -203,7 +224,7 @@ export default {
       multiple: true,
       // 总条数
       total: 0,
-      // 文章信息表格数据
+      // 发文信息表格数据
       articleList: [],
       // 弹出层标题
       title: "",
@@ -213,6 +234,8 @@ export default {
       articleTypeOptions: [],
       // 发布状态字典
       articleStatusOptions: [],
+      // 是否字典
+      yesOrNotOptions: [],
       // 部门字典
       deptOptions: [],
       // 查询参数
@@ -228,6 +251,11 @@ export default {
       form: {},
       // 表单校验
       rules: {
+      },
+      fileList: [],
+      uploadUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传服务器地址
+      headers: {
+        Authorization: 'Bearer ' + getToken()
       }
     };
   },
@@ -239,9 +267,12 @@ export default {
     this.getDicts("POST_STATUS").then(response => {
       this.articleStatusOptions = response.data;
     });
+    this.getDicts("YES_OR_NOT").then(response => {
+      this.yesOrNotOptions = response.data;
+    });
   },
   methods: {
-    /** 查询文章信息列表 */
+    /** 查询发文信息列表 */
     getList() {
       this.loading = true;
       listArticle(this.queryParams).then(response => {
@@ -272,6 +303,7 @@ export default {
         title: undefined,
         content: undefined,
         accessoryUrl: undefined,
+        isPdf: undefined,
         articleStatus: undefined,
         status: "0",
         createUser: undefined,
@@ -301,16 +333,28 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加文章信息";
+      this.title = "添加发文信息";
+      this.fileList = [];
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
       const id = row.id || this.ids
+      this.fileList = [];
       getArticle(id).then(response => {
         this.form = response.data;
+        let acc = this.form.accessoryUrl;
+        if(acc != null && acc != ''){
+          let arr1 = acc.split(',');
+          for(let a1 of arr1){
+            let arr2 = a1.split('|');
+            var obj1 = {name: arr2[0],url: arr2[1]};
+            this.fileList.push(obj1);
+          }
+        }
+        //this.fileList = [{name: 'food.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}, {name: 'food2.jpeg', url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'}];
         this.open = true;
-        this.title = "修改文章信息";
+        this.title = "修改发文信息";
       });
     },
     /** 提交按钮 */
@@ -340,7 +384,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;
-      this.$confirm('是否确认删除文章信息编号为"' + ids + '"的数据项?', "警告", {
+      this.$confirm('是否确认删除发文信息编号为"' + ids + '"的数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
@@ -354,7 +398,7 @@ export default {
     /** 导出按钮操作 */
     handleExport() {
       const queryParams = this.queryParams;
-      this.$confirm('是否确认导出所有文章信息数据项?', "警告", {
+      this.$confirm('是否确认导出所有发文信息数据项?', "警告", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
@@ -366,13 +410,87 @@ export default {
     },
     /** 预览 **/
     handlePreview(row) {
-      const id = row.id;
-      let routeData = this.$router.resolve({ 
-          path: '/input/article/preview',
-          query: {id: row.id},
-      });
-      window.open(routeData.href, '_blank');
+      if(row.isPdf == '1'){
+        //pdf直接显示附件
+        // let acc = row.accessoryUrl;
+        // if(acc != null && acc != ''){
+        //   let arr1 = acc.split(',');
+        //   let url = "";
+        //   for(let a1 of arr1){
+        //     let arr2 = a1.split('|');
+        //     var win1 = window.open(arr2[1], '_blank');
+        //     win1.document.title=arr2[0];
+        //   }
+        // }else{
+        //   this.$message.error("没有附件，无法预览");
+        //   return false;
+        // }
+        const id = row.id;
+        let routeData = this.$router.resolve({ 
+            path: '/input/article/preview',
+            query: {id: row.id},
+        });
+        window.open(routeData.href, '_blank');
+      }else{
+        const id = row.id;
+        let routeData = this.$router.resolve({ 
+            path: '/input/article/preview',
+            query: {id: row.id},
+        });
+        window.open(routeData.href, '_blank');
+      }
     },
+    isPdfOnChange(val){
+      if(val == '1'){
+        //是
+
+      }else if(val == '0'){
+        //否
+
+      }
+    },
+    //删除附件
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+      this.form.accessoryUrl = null;
+    },
+    //预览附件
+    handleOnPreview(file, fileList){
+      // let routeData = this.$router.resolve({ 
+      //     path: file.url
+      // });
+      window.open(file.url, '_blank');
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      return false;
+    },
+    beforeRemove(file, fileList) {
+      // return this.$confirm(`确定移除 ${ file.name }？`);
+      return true;
+    },
+    handleUploadBefore(file) {
+      let fileType = file.type;
+      console.log(fileType);
+			if(fileType === 'application/pdf'){
+				return true;
+			}else {
+				this.$message.error('只能上传pdf');
+				return false;
+			}
+    },
+    handleUploadSuccess(res, file) {
+      // 如果上传成功
+      if (res.code == 200) {
+        this.form.accessoryUrl = file.name + "|" + res.url;
+      } else {
+        this.$message.error("文件上传失败");
+      }
+    },
+    handleUploadError() {
+      // loading动画消失
+      this.$message.error("文件上传失败");
+    }
   }
 };
 </script>

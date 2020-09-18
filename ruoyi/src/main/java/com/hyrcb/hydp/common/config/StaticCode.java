@@ -63,4 +63,9 @@
  	public static final String DEFAULT_FILE_ENCODE = "UTF-8";
  	
  	public static final int MAX_IN_PARAMS = 500;
+ 	
+ 	public static final String DATA_AUTH_MAP = "DATA_AUTH_MAP";
+ 	
+ 	public static final String DATA_AUTH_MAP_MAPPERNAME = "DATA_AUTH_MAP_MAPPERNAME";
+ 	
  }

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.ruoyi.framework.aspectj.lang.annotation.DataAuth;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
@@ -24,6 +23,7 @@ import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.system.service.ISysDeptService;
 
 /**
  * 文章信息Controller
@@ -38,6 +38,9 @@ public class PbcArticleController extends BaseController {
 
     @Autowired
     private IPbcArticleService iPbcArticleService;
+    
+    @Autowired
+    private ISysDeptService deptService;
 
     /**
      * 查询文章信息列表
@@ -48,7 +51,7 @@ public class PbcArticleController extends BaseController {
     public TableDataInfo list(PbcArticle pbcArticle){
         startPage();
         LambdaQueryWrapper<PbcArticle> lqw = new LambdaQueryWrapper<PbcArticle>();
-        if (StringUtils.isNotBlank(pbcArticle.getDeptId())){
+        if (pbcArticle.getDeptId() != null && pbcArticle.getDeptId() != 0L){
             lqw.eq(PbcArticle::getDeptId ,pbcArticle.getDeptId());
         }
         if (StringUtils.isNotBlank(pbcArticle.getArticleType())){
@@ -61,7 +64,17 @@ public class PbcArticleController extends BaseController {
             lqw.like(PbcArticle::getContent ,pbcArticle.getContent());
         }
         List<PbcArticle> list = iPbcArticleService.list(lqw);
+        format(list);
         return getDataTable(list);
+    }
+    
+    void format(List<PbcArticle> list) {
+    	if(list != null && list.size() > 0) {
+    		for(PbcArticle pa : list) {
+    			Long deptId = pa.getDeptId();
+    			pa.setDeptName(deptService.selectDeptById(deptId).getDeptName());
+    		}
+    	}
     }
 
     /**

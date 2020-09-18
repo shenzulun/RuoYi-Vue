@@ -40,7 +40,7 @@ const toolbarOptions = [
   [{ color: [] }, { background: [] }],             // 字体颜色、字体背景颜色
   [{ align: [] }],                                 // 对齐方式
   ["clean"],                                       // 清除文本格式
-  ["link", "image", "video"]                       // 链接、图片、视频
+  ["link", "image", "video", "upload"]                       // 链接、图片、视频
 ];
 
 import { quillEditor } from "vue-quill-editor";
@@ -79,6 +79,11 @@ export default {
                   document.querySelector(".quill-img input").click();
                 } else {
                   this.quill.format("image", false);
+                }
+              },
+              'upload': function(value){
+                if(value){
+                  alert("111");
                 }
               }
             }
@@ -144,7 +149,7 @@ export default {
 };
 </script> 
 
-<style>
+<style lang="less">
 .editor {
   line-height: normal !important;
   height: 300px;
@@ -163,6 +168,13 @@ export default {
 
 .ql-snow .ql-tooltip[data-mode="video"]::before {
   content: "请输入视频地址:";
+}
+
+.ql-snow.ql-toolbar .ql-upload {
+  background-image: url("../../assets/icons/svg/upload.svg");
+  background-size: 16px 16px;
+  background-position: center center;
+  background-repeat: no-repeat;
 }
 
 .ql-snow .ql-picker.ql-size .ql-picker-label::before,

@@ -5,6 +5,8 @@ import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -28,7 +30,7 @@ private static final long serialVersionUID=1L;
 
     /** 所属机构 */
     @Excel(name = "所属机构")
-    private String deptId;
+    private Long deptId;
 
     /** 信息类型 */
     @Excel(name = "信息类型")
@@ -44,6 +46,9 @@ private static final long serialVersionUID=1L;
 
     /** 附件 */
     private String accessoryUrl;
+    
+    /** 是否PDF */
+    private String isPdf;
 
     /** 发布状态 */
     @Excel(name = "发布状态")
@@ -67,6 +72,9 @@ private static final long serialVersionUID=1L;
     @Excel(name = "更新时间" , width = 30, dateFormat = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
+    
+    @TableField(exist=false)
+    private String deptName;
 
     public void setId(Long id) {
         this.id = id;
@@ -75,11 +83,11 @@ private static final long serialVersionUID=1L;
     public Long getId() {
         return id;
     }
-    public void setDeptId(String deptId) {
+    public void setDeptId(Long deptId) {
         this.deptId = deptId;
     }
 
-    public String getDeptId() {
+    public Long getDeptId() {
         return deptId;
     }
     public void setArticleType(String articleType) {
@@ -152,4 +160,21 @@ private static final long serialVersionUID=1L;
     public Date getUpdateTime() {
         return updateTime;
     }
+
+	public String getDeptName() {
+		return deptName;
+	}
+
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+
+	public String getIsPdf() {
+		return isPdf;
+	}
+
+	public void setIsPdf(String isPdf) {
+		this.isPdf = isPdf;
+	}
+    
 }

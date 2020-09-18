@@ -1,16 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
-      <el-form-item label="所属机构" prop="deptId">
-        <el-input
-          v-model="queryParams.deptId"
-          placeholder="请输入所属机构"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      
       <el-form-item label="标题" prop="title">
         <el-input
           v-model="queryParams.title"
@@ -35,10 +25,9 @@
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="loading" :data="ArticleList" stripe border @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
+    <el-table v-loading="loading" :data="ArticleList" stripe border>
       <el-table-column label="主键" align="center" prop="id" v-if="false"/>
-      <el-table-column label="所属机构" align="center" prop="deptId" />
+      <el-table-column label="所属机构" align="center" prop="deptName" />
       <el-table-column label="信息类型" align="center" prop="articleType" :formatter="articleTypeFormat" />
       <el-table-column label="标题" align="center" prop="title" />
       <el-table-column label="发布状态" align="center" prop="articleStatus" :formatter="articleStatusFormat" />

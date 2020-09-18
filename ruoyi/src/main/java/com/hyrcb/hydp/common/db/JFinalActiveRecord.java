@@ -7,6 +7,7 @@ package com.hyrcb.hydp.common.db;
 import com.hyrcb.hydp.common.core.BeanFactory;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.activerecord.dialect.AnsiSqlDialect;
+import com.jfinal.plugin.activerecord.dialect.MysqlDialect;
 import com.jfinal.plugin.druid.DruidPlugin;
 import me.belucky.easytool.task.AbstractTask;
 
@@ -29,7 +30,7 @@ public class JFinalActiveRecord extends AbstractTask{
 		druidPlugin.start();
 		ActiveRecordPlugin arp = new ActiveRecordPlugin(druidPlugin);
 		arp.setShowSql(true);
-		arp.setDialect(new AnsiSqlDialect());
+		arp.setDialect(new MysqlDialect());
 		arp.start();
 		
 	}

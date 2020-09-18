@@ -24,6 +24,7 @@ public class PbcArticleServiceImpl extends ServiceImpl<PbcArticleMapper, PbcArti
 		}
 		pbcArticle.setCreateTime(new Date());
 		pbcArticle.setStatus("1");
+		pbcArticle.setDeptId(SecurityUtils.getLoginUser().getUser().getDeptId());
 		return save(pbcArticle);
 	}
 
