@@ -38,12 +38,17 @@ public class BaiduMapUtils {
 		
 		String jsonResult = HttpUtils.sendGet(url, param);
 		log.info(jsonResult);
-		String str1 = CommonUtils.regexMatch(jsonResult, "showLocation\\((.+?)\\)");
+		String str1 = jsonResult;
+		if(!jsonResult.startsWith("{")) {
+			str1 = CommonUtils.regexMatch(jsonResult, "showLocation\\((.+?)\\)");
+		}
 		BaiduMapResponseModel<BaiduMapShowLocationResponseModel> resp = JsonUtils.toObject(str1, BaiduMapResponseModel.class, BaiduMapShowLocationResponseModel.class);
 		
 		if(resp != null && resp.getStatus() == 0) {
 			BaiduMapLocation location = resp.getResult().getLocation();
 			locationStr = location.getLat() + "," + location.getLng();
+		}else {
+			//log.error(resp.get);
 		}
 		return locationStr;
 	}

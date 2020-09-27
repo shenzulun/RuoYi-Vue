@@ -12,9 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import com.LaunchEntry;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.hyrcb.hydp.modules.pbc.domain.PbcCustinfo;
 import com.hyrcb.hydp.modules.pbc.service.IPbcCustinfoService;
+import com.hyrcb.hydp.modules.tool.map.BaiduMapUtils;
 
+import me.belucky.easytool.util.CommonUtils;
 import me.belucky.easytool.util.FileTools;
 import me.belucky.easytool.util.StringUtils;
 
@@ -103,7 +106,7 @@ public class PbcCustInfoTest {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testSaveBatch4() {
 		List<String> list = FileTools.getContentList("E:/人行三色图/数据录入/无贷户企业清单分配.txt", true, "UTF-8");
 		
@@ -124,6 +127,27 @@ public class PbcCustInfoTest {
 			cust.setStatus("1");
 			cust.setTag("无贷户企业清单分配");
 			iPbcCustinfoService.addPbcCustinfo(cust);
+		}
+	}
+	
+	@Test
+	public void testUpdateGeoCode() {
+		LambdaQueryWrapper<PbcCustinfo> lqw = new LambdaQueryWrapper<PbcCustinfo>();
+		lqw.eq(PbcCustinfo::getGeoCode ,null);
+		List<PbcCustinfo> list = iPbcCustinfoService.list();
+		for(PbcCustinfo pbcCust : list) {
+			if(StringUtils.isNotNull(pbcCust.getGeoCode())) {
+				continue;
+			}
+			String address = pbcCust.getAddress();
+			if(StringUtils.isNotBlank(address)) {
+				String location = BaiduMapUtils.showLocation(address);
+				if(StringUtils.isNotNull(location)) {
+					pbcCust.setGeoCode(location);
+					iPbcCustinfoService.updateById(pbcCust);
+				}
+				CommonUtils.sleep(200);
+			}
 		}
 	}
 	
