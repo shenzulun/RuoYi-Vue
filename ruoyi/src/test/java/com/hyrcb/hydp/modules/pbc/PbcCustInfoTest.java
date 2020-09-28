@@ -130,7 +130,7 @@ public class PbcCustInfoTest {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testUpdateGeoCode() {
 		LambdaQueryWrapper<PbcCustinfo> lqw = new LambdaQueryWrapper<PbcCustinfo>();
 		lqw.eq(PbcCustinfo::getGeoCode ,null);
@@ -147,6 +147,19 @@ public class PbcCustInfoTest {
 					iPbcCustinfoService.updateById(pbcCust);
 				}
 				CommonUtils.sleep(200);
+			}
+		}
+	}
+	
+	@Test
+	public void updateGeoCode() {
+		List<PbcCustinfo> list = iPbcCustinfoService.list();
+		for(PbcCustinfo pbcCust : list) {
+			String location = pbcCust.getGeoCode();
+			if(StringUtils.isNotNull(location) && !location.startsWith("121")) {
+				String[] arr = location.split(",");
+				pbcCust.setGeoCode(arr[1] + "," + arr[0]);
+				iPbcCustinfoService.updateById(pbcCust);
 			}
 		}
 	}

@@ -17,9 +17,13 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonInclude(Include.NON_NULL)
 public class BaiduMapLocation {
-	
+	/**
+	 * 纬度值
+	 */
 	private float lat;
-	
+	/**
+	 * 	经度值
+	 */
 	private float lng;
 	
 	public BaiduMapLocation() {}

@@ -5,6 +5,8 @@ import com.ruoyi.framework.aspectj.lang.annotation.Excel;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -19,8 +21,7 @@ import java.util.Date;
 @TableName("pbc_bankinfo")
 public class PbcBankinfo implements Serializable {
 
-private static final long serialVersionUID=1L;
-
+	private static final long serialVersionUID=1L;
 
     /** 主键 */
     @TableId(value = "id", type = IdType.AUTO)
@@ -40,7 +41,7 @@ private static final long serialVersionUID=1L;
 
     /** 所属机构 */
     @Excel(name = "所属机构")
-    private String deptId;
+    private Long deptId;
 
     /** 地址 */
     @Excel(name = "地址")
@@ -68,6 +69,11 @@ private static final long serialVersionUID=1L;
     @Excel(name = "更新时间" , width = 30, dateFormat = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
+    /**
+     * 所属机构名称
+     */
+    @TableField(exist=false)
+    private String deptName;
 
     public void setId(Long id) {
         this.id = id;
@@ -97,11 +103,11 @@ private static final long serialVersionUID=1L;
     public String getBankNo() {
         return bankNo;
     }
-    public void setDeptId(String deptId) {
+    public void setDeptId(Long deptId) {
         this.deptId = deptId;
     }
 
-    public String getDeptId() {
+    public Long getDeptId() {
         return deptId;
     }
     public void setAddress(String address) {
@@ -153,4 +159,13 @@ private static final long serialVersionUID=1L;
     public Date getUpdateTime() {
         return updateTime;
     }
+
+	public String getDeptName() {
+		return deptName;
+	}
+
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
+	}
+    
 }

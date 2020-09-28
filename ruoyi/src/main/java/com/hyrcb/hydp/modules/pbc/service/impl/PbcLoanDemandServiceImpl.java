@@ -1,9 +1,12 @@
 package com.hyrcb.hydp.modules.pbc.service.impl;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hyrcb.hydp.modules.pbc.mapper.PbcLoanDemandMapper;
 import com.hyrcb.hydp.modules.pbc.domain.PbcLoanDemand;
@@ -49,6 +52,7 @@ public class PbcLoanDemandServiceImpl extends ServiceImpl<PbcLoanDemandMapper, P
 		if(seqI >= 999999) {
 			seqI = 1;
 		}
+		seqI++;
 		sysConfig.setConfigValue(seqI + "");
 		configService.updateConfig(sysConfig);
 		return today + (StringUtils.intToStringBySpecifiedLength(Integer.valueOf(seq), 6, true, "0"));

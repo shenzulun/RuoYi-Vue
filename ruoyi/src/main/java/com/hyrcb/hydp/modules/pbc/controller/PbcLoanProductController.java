@@ -1,7 +1,6 @@
 package com.hyrcb.hydp.modules.pbc.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-
 import java.util.List;
 import java.util.Arrays;
 import com.ruoyi.common.utils.StringUtils;
@@ -23,6 +22,7 @@ import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.system.service.ISysDeptService;
 
 /**
  * 贷款产品Controller
@@ -37,6 +37,9 @@ public class PbcLoanProductController extends BaseController {
 
     @Autowired
     private IPbcLoanProductService iPbcLoanProductService;
+    
+    @Autowired
+    private ISysDeptService deptService;
 
     /**
      * 查询贷款产品列表
@@ -46,7 +49,7 @@ public class PbcLoanProductController extends BaseController {
     public TableDataInfo list(PbcLoanProduct pbcLoanProduct){
         startPage();
         LambdaQueryWrapper<PbcLoanProduct> lqw = new LambdaQueryWrapper<PbcLoanProduct>();
-        if (StringUtils.isNotBlank(pbcLoanProduct.getDeptId())){
+        if (pbcLoanProduct.getDeptId() != null && pbcLoanProduct.getDeptId() != 0L){
             lqw.eq(PbcLoanProduct::getDeptId ,pbcLoanProduct.getDeptId());
         }
         if (StringUtils.isNotBlank(pbcLoanProduct.getProductType())){
@@ -56,7 +59,19 @@ public class PbcLoanProductController extends BaseController {
             lqw.like(PbcLoanProduct::getName ,pbcLoanProduct.getName());
         }
         List<PbcLoanProduct> list = iPbcLoanProductService.list(lqw);
+        format(list);
         return getDataTable(list);
+    }
+    
+    void format(List<PbcLoanProduct> list) {
+    	if(list != null && list.size() > 0) {
+    		for(PbcLoanProduct pa : list) {
+    			Long deptId = pa.getDeptId();
+    			if(deptId != null && deptId != 0L) {
+    				pa.setDeptName(deptService.selectDeptById(deptId).getDeptName());
+    			}
+    		}
+    	}
     }
 
     /**

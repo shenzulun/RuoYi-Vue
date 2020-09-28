@@ -23,6 +23,7 @@ import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.system.service.ISysDeptService;
 
 /**
  * 银行信息Controller
@@ -37,6 +38,9 @@ public class PbcBankinfoController extends BaseController {
 
     @Autowired
     private IPbcBankinfoService iPbcBankinfoService;
+    
+    @Autowired
+    private ISysDeptService deptService;
 
     /**
      * 查询银行信息列表
@@ -52,14 +56,26 @@ public class PbcBankinfoController extends BaseController {
         if (StringUtils.isNotBlank(pbcBankinfo.getBankName())){
             lqw.like(PbcBankinfo::getBankName ,pbcBankinfo.getBankName());
         }
-        if (StringUtils.isNotBlank(pbcBankinfo.getDeptId())){
+        if (pbcBankinfo.getDeptId() != null && pbcBankinfo.getDeptId() != 0L){
             lqw.eq(PbcBankinfo::getDeptId ,pbcBankinfo.getDeptId());
         }
         if (StringUtils.isNotBlank(pbcBankinfo.getAddress())){
             lqw.like(PbcBankinfo::getAddress ,pbcBankinfo.getAddress());
         }
         List<PbcBankinfo> list = iPbcBankinfoService.list(lqw);
+        format(list);
         return getDataTable(list);
+    }
+    
+    void format(List<PbcBankinfo> list) {
+    	if(list != null && list.size() > 0) {
+    		for(PbcBankinfo pa : list) {
+    			Long deptId = pa.getDeptId();
+    			if(deptId != null && deptId != 0L) {
+    				pa.setDeptName(deptService.selectDeptById(deptId).getDeptName());
+    			}
+    		}
+    	}
     }
 
     /**

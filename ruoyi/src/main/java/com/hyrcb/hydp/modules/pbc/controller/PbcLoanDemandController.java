@@ -1,7 +1,7 @@
 package com.hyrcb.hydp.modules.pbc.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import java.util.List;
 import java.util.Arrays;
 import com.ruoyi.common.utils.StringUtils;
@@ -17,7 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.hyrcb.hydp.modules.pbc.domain.PbcBankinfo;
+import com.hyrcb.hydp.modules.pbc.domain.PbcCustinfo;
 import com.hyrcb.hydp.modules.pbc.domain.PbcLoanDemand;
+import com.hyrcb.hydp.modules.pbc.service.IPbcBankinfoService;
+import com.hyrcb.hydp.modules.pbc.service.IPbcCustinfoService;
 import com.hyrcb.hydp.modules.pbc.service.IPbcLoanDemandService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
@@ -37,6 +41,12 @@ public class PbcLoanDemandController extends BaseController {
 
     @Autowired
     private IPbcLoanDemandService iPbcLoanDemandService;
+    
+    @Autowired
+    private IPbcCustinfoService iPbcCustinfoService;
+    
+    @Autowired
+    private IPbcBankinfoService iPbcBankinfoService;
 
     /**
      * 查询企业融资需求列表
@@ -59,6 +69,27 @@ public class PbcLoanDemandController extends BaseController {
             lqw.eq(PbcLoanDemand::getSolveBankNo ,pbcLoanDemand.getSolveBankNo());
         }
         List<PbcLoanDemand> list = iPbcLoanDemandService.list(lqw);
+        for(PbcLoanDemand pbc : list) {
+        	if(StringUtils.isNotNull(pbc.getCustNo())) {
+        		PbcCustinfo pbcCustInfo = new PbcCustinfo();
+        		pbcCustInfo.setCustNo(pbc.getCustNo());
+        		
+        		pbcCustInfo = iPbcCustinfoService.getOne(Wrappers.lambdaQuery(pbcCustInfo));
+        		if(pbcCustInfo != null) {
+        			pbc.setCustName(pbcCustInfo.getCustName());
+        		}
+        	}
+        	
+        	if(StringUtils.isNotNull(pbc.getSolveBankNo())) {
+        		PbcBankinfo pbcBankinfo = new PbcBankinfo();
+        		pbcBankinfo.setBankId(pbc.getSolveBankNo());
+        		
+        		pbcBankinfo = iPbcBankinfoService.getOne(Wrappers.lambdaQuery(pbcBankinfo));
+        		if(pbcBankinfo != null) {
+        			pbc.setBankName(pbcBankinfo.getBankName());
+        		}
+        	}
+        }
         return getDataTable(list);
     }
 
