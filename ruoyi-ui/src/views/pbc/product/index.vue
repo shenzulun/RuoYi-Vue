@@ -2,6 +2,7 @@
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" label-width="68px">
       <el-form-item label="所属机构" prop="deptId">
+        <!--
         <el-input
           v-model="queryParams.deptId"
           placeholder="请输入所属机构"
@@ -9,6 +10,8 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+        -->
+        <Dept v-model="queryParams.deptId"></Dept>
       </el-form-item>
       <el-form-item label="产品类型" prop="productType">
         <el-select v-model="queryParams.productType" placeholder="请选择产品类型" clearable size="small">
@@ -79,7 +82,7 @@
     <el-table v-loading="loading" :data="productList" stripe border @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="主键" align="center" prop="id" v-if="false"/>
-      <el-table-column label="所属机构" align="center" prop="deptId" />
+      <el-table-column label="所属机构" align="center" prop="deptName" />
       <el-table-column label="产品类型" align="center" prop="productType" :formatter="productTypeFormat" />
       <el-table-column label="产品名称" align="center" prop="name" />
       <el-table-column label="内容" align="center" prop="content" />
@@ -123,10 +126,13 @@
     />
 
     <!-- 添加或修改贷款产品对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
+    <el-dialog :title="title" :visible.sync="open"  width="80%" height="60%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="所属机构" prop="deptId">
+          <!--
           <el-input v-model="form.deptId" placeholder="请输入所属机构" />
+          -->
+          <Dept v-model="form.deptId"></Dept>
         </el-form-item>
         <el-form-item label="产品类型">
           <el-select v-model="form.productType" placeholder="请选择产品类型">
@@ -142,7 +148,10 @@
           <el-input v-model="form.name" placeholder="请输入产品名称" />
         </el-form-item>
         <el-form-item label="内容" prop="content">
+          <!--
           <el-input v-model="form.content" type="textarea" placeholder="请输入内容" />
+          -->
+          <Editor v-model="form.content" />
         </el-form-item>
         <el-form-item label="发布状态">
           <el-select v-model="form.productStatus" placeholder="请选择发布状态">
@@ -165,9 +174,14 @@
 
 <script>
 import { listProduct, getProduct, delProduct, addProduct, updateProduct, exportProduct } from "@/api/pbc/product";
+import Dept from "@/components/Choose/Dept";
+import Editor from '@/components/Editor';
 
 export default {
   name: "Product",
+  components: {
+    Dept,Editor
+  },
   data() {
     return {
       // 遮罩层

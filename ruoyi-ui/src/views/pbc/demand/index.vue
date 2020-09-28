@@ -11,6 +11,7 @@
         />
       </el-form-item>
       <el-form-item label="客户号" prop="custNo">
+        <!--
         <el-input
           v-model="queryParams.custNo"
           placeholder="请输入客户号"
@@ -18,6 +19,8 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+        -->
+        <Custno v-model="queryParams.custNo"></Custno>
       </el-form-item>
       <el-form-item label="解决状态" prop="solveStatus">
         <el-select v-model="queryParams.solveStatus" placeholder="请选择解决状态" clearable size="small">
@@ -30,6 +33,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="解决银行" prop="solveBankNo">
+        <!--
         <el-input
           v-model="queryParams.solveBankNo"
           placeholder="请输入解决银行"
@@ -37,6 +41,8 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+        -->
+        <Bankno v-model="queryParams.solveBankNo"></Bankno>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -90,11 +96,12 @@
       <el-table-column label="主键" align="center" prop="id" v-if="false"/>
       <el-table-column label="需求编号" align="center" prop="demandNo" />
       <el-table-column label="客户号" align="center" prop="custNo" />
+      <el-table-column label="客户名称" align="center" prop="custName" />
       <el-table-column label="融资类型" align="center" prop="loanType" :formatter="loanTypeFormat" />
       <el-table-column label="融资金额" align="center" prop="loanAmount" />
       <el-table-column label="保证方式" align="center" prop="guaranteeType" :formatter="guaranteeTypeFormat" />
       <el-table-column label="解决状态" align="center" prop="solveStatus" :formatter="solveStatusFormat" />
-      <el-table-column label="解决银行" align="center" prop="solveBankNo" />
+      <el-table-column label="解决银行" align="center" prop="bankName" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
           <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</span>
@@ -137,7 +144,10 @@
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="客户号" prop="custNo">
+          <!--
           <el-input v-model="form.custNo" placeholder="请输入客户号" />
+          -->
+          <Custno v-model="form.custNo"></Custno>
         </el-form-item>
         <el-form-item label="融资类型">
           <el-select v-model="form.loanType" placeholder="请选择融资类型">
@@ -150,7 +160,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="融资金额" prop="loanAmount">
-          <el-input v-model="form.loanAmount" placeholder="请输入融资金额" />
+          <el-input type="number" v-model="form.loanAmount" placeholder="请输入融资金额" />
         </el-form-item>
         <el-form-item label="保证方式">
           <el-select v-model="form.guaranteeType" placeholder="请选择保证方式">
@@ -173,7 +183,10 @@
           </el-select>
         </el-form-item>
         <el-form-item label="解决银行" prop="solveBankNo">
+          <!--
           <el-input v-model="form.solveBankNo" placeholder="请输入解决银行" />
+          -->
+          <Bankno v-model="form.solveBankNo"></Bankno>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -186,9 +199,14 @@
 
 <script>
 import { listDemand, getDemand, delDemand, addDemand, updateDemand, exportDemand } from "@/api/pbc/demand";
+import Custno from "@/components/Choose/Custno";
+import Bankno from "@/components/Choose/Bankno";
 
 export default {
   name: "Demand",
+  components: {
+    Custno,Bankno
+  },
   data() {
     return {
       // 遮罩层

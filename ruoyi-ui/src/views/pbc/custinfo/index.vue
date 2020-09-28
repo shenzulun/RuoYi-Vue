@@ -175,6 +175,7 @@
           <el-input v-model="form.address" placeholder="请输入地址" />
         </el-form-item>
         <el-form-item label="坐标" prop="geoCode">
+          <el-button type="info" icon="el-icon-search" @click="handleshowLocation()">查询坐标</el-button>
           <el-input v-model="form.geoCode" placeholder="请输入坐标" />
         </el-form-item>
         <el-form-item label="联系方式" prop="contactTel">
@@ -204,6 +205,7 @@
 
 <script>
 import { listCustinfo, getCustinfo, delCustinfo, addCustinfo, updateCustinfo, exportCustinfo } from "@/api/pbc/custinfo";
+import {showLocation} from "@/api/tool/baidumap";
 
 export default {
   name: "Custinfo",
@@ -385,6 +387,21 @@ export default {
         }).then(response => {
           this.download(response.msg);
         }).catch(function() {});
+    },
+    // 地址 -> 坐标
+    handleshowLocation(){
+      var address = this.form.address;
+      if(address != null && address != ''){
+        var queryP = {'address': address};
+        showLocation(queryP).then(response => {
+          let location = response.data;
+          if(location != null){
+            this.form.geoCode = location.lng + "," + location.lat;
+          }
+        });
+      }else{
+        this.$message.error("地址信息不能为空...");
+      }
     }
   }
 };

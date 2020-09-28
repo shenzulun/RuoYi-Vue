@@ -20,6 +20,7 @@
         />
       </el-form-item>
       <el-form-item label="所属机构" prop="deptId">
+        <!--
         <el-input
           v-model="queryParams.deptId"
           placeholder="请输入所属机构"
@@ -27,6 +28,8 @@
           size="small"
           @keyup.enter.native="handleQuery"
         />
+        -->
+        <Dept v-model="queryParams.deptId"></Dept>
       </el-form-item>
       <el-form-item label="地址" prop="address">
         <el-input
@@ -90,7 +93,7 @@
       <el-table-column label="银行编号" align="center" prop="bankId" />
       <el-table-column label="银行名称" align="center" prop="bankName" />
       <el-table-column label="银行行号" align="center" prop="bankNo" />
-      <el-table-column label="所属机构" align="center" prop="deptId" />
+      <el-table-column label="所属机构" align="center" prop="deptName" />
       <el-table-column label="地址" align="center" prop="address" />
       <el-table-column label="坐标" align="center" prop="geoCode" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -141,12 +144,16 @@
           <el-input v-model="form.bankNo" placeholder="请输入银行行号" />
         </el-form-item>
         <el-form-item label="所属机构" prop="deptId">
+          <!--
           <el-input v-model="form.deptId" placeholder="请输入所属机构" />
+          -->
+          <Dept v-model="form.deptId"></Dept>
         </el-form-item>
         <el-form-item label="地址" prop="address">
           <el-input v-model="form.address" placeholder="请输入地址" />
         </el-form-item>
         <el-form-item label="坐标" prop="geoCode">
+          <el-button type="info" icon="el-icon-search" @click="handleshowLocation()">查询坐标</el-button>
           <el-input v-model="form.geoCode" placeholder="请输入坐标" />
         </el-form-item>
       </el-form>
@@ -160,9 +167,14 @@
 
 <script>
 import { listBankinfo, getBankinfo, delBankinfo, addBankinfo, updateBankinfo, exportBankinfo } from "@/api/pbc/bankinfo";
+import {showLocation} from "@/api/tool/baidumap";
+import Dept from "@/components/Choose/Dept";
 
 export default {
   name: "Bankinfo",
+  components: {
+    Dept
+  },
   data() {
     return {
       // 遮罩层
@@ -315,6 +327,21 @@ export default {
         }).then(response => {
           this.download(response.msg);
         }).catch(function() {});
+    },
+    // 地址 -> 坐标
+    handleshowLocation(){
+      var address = this.form.address;
+      if(address != null && address != ''){
+        var queryP = {'address': address};
+        showLocation(queryP).then(response => {
+          let location = response.data;
+          if(location != null){
+            this.form.geoCode = location.lng + "," + location.lat;
+          }
+        });
+      }else{
+        this.$message.error("地址信息不能为空...");
+      }
     }
   }
 };

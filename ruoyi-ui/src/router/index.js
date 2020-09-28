@@ -144,7 +144,22 @@ export const constantRoutes = [
     path: '/input/article/preview',
     component: (resolve) => require(['@/views/pbc/article/preview'], resolve),
     hidden: true
-  }
+  },
+  {
+    path: '/choose/custno',
+    component: (resolve) => require(['@/components/Choose/Custno'], resolve),
+    hidden: true
+  },
+  {
+    path: '/choose/bankno',
+    component: (resolve) => require(['@/components/Choose/Bankno'], resolve),
+    hidden: true
+  },
+  {
+    path: '/choose/dept',
+    component: (resolve) => require(['@/components/Choose/Dept'], resolve),
+    hidden: true
+  },
 ]
 
 export default new Router({
