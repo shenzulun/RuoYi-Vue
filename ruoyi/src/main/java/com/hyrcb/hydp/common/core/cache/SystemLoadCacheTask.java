@@ -16,7 +16,7 @@ import me.belucky.easytool.task.AbstractTask;
 import me.belucky.easytool.util.CacheUtils;
 
 /**
- * Description: 
+ * Description: 系统初始化缓存任务
  * @author shenzulun
  * @date 2020-09-16
  * @version 1.0

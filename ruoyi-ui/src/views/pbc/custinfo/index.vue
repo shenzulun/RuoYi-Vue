@@ -172,6 +172,7 @@
           <el-input v-model="form.contactPerson" placeholder="请输入联系人" />
         </el-form-item>
         <el-form-item label="地址" prop="address">
+          <v-region :town="true" v-model="addressCodeMap" @values="regionChange"></v-region>
           <el-input v-model="form.address" placeholder="请输入地址" />
         </el-form-item>
         <el-form-item label="坐标" prop="geoCode">
@@ -206,6 +207,7 @@
 <script>
 import { listCustinfo, getCustinfo, delCustinfo, addCustinfo, updateCustinfo, exportCustinfo } from "@/api/pbc/custinfo";
 import {showLocation} from "@/api/tool/baidumap";
+import {getAddressCodeDetail} from "@/api/tool/common";
 
 export default {
   name: "Custinfo",
@@ -244,7 +246,8 @@ export default {
       form: {},
       // 表单校验
       rules: {
-      }
+      },
+      addressCodeMap: undefined
     };
   },
   created() {
@@ -304,6 +307,7 @@ export default {
         updateTime: undefined
       };
       this.resetForm("form");
+      this.addressCodeMap = undefined;
     },
     /** 搜索按钮操作 */
     handleQuery() {
@@ -333,6 +337,18 @@ export default {
       const id = row.id || this.ids
       getCustinfo(id).then(response => {
         this.form = response.data;
+        let addressCode = this.form.addressCode;
+        if(addressCode != null && addressCode != undefined){
+          getAddressCodeDetail(addressCode).then(response1 => {
+            let r = response1.data;
+            this.addressCodeMap = {
+              province:r.lev1,
+              city:r.lev2,
+              area:r.lev3,
+              town:lev4
+            };
+          });
+        }
         this.open = true;
         this.title = "修改企业信息";
       });
@@ -401,6 +417,18 @@ export default {
         });
       }else{
         this.$message.error("地址信息不能为空...");
+      }
+    },
+    regionChange(data){
+      console.log(data);
+      if(data.town != null){
+        this.form.addressCode = data.town.key;
+      }else if(data.area != null){
+        this.form.addressCode = data.area.key;
+      }else if(data.city != null){
+        this.form.addressCode = data.city.key;
+      }else{
+        this.form.addressCode = data.province.key;
       }
     }
   }

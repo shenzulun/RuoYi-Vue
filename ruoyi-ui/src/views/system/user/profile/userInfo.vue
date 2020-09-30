@@ -38,6 +38,7 @@ export default {
         nickName: [
           { required: true, message: "用户昵称不能为空", trigger: "blur" }
         ],
+        /**
         email: [
           { required: true, message: "邮箱地址不能为空", trigger: "blur" },
           {
@@ -53,7 +54,7 @@ export default {
             message: "请输入正确的手机号码",
             trigger: "blur"
           }
-        ]
+        ]*/
       }
     };
   },

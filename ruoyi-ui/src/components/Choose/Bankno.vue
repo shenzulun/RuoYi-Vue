@@ -108,9 +108,15 @@
         created() {
             this.reset();
         },
+        watch: {
+            value: function () {
+                this.bankNoChoose = this.value;
+            }
+        },    
         methods: {
             //打开客户信息查询窗口
             openbankNoChooseWindow(){
+                this.reset();
                 this.open = true
             },
             //选择客户

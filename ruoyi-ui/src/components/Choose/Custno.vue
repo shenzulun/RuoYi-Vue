@@ -124,6 +124,11 @@
                 this.scaleOptions = response.data;
             });
         },
+        watch: {
+            value: function () {
+                this.custNoChoose = this.value;
+            }
+        }, 
         methods: {
             //打开客户信息查询窗口
             openCustNoChooseWindow(){

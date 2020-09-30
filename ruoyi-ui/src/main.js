@@ -22,6 +22,7 @@ import { parseTime, resetForm, addDateRange, selectDictLabel, download, handleTr
 import Pagination from "@/components/Pagination";
 
 import dataV from '@jiaminghi/data-view';
+import vRegion from 'v-region'
 
 // 全局方法挂载
 Vue.prototype.getDicts = getDicts
@@ -51,6 +52,7 @@ Vue.component('Pagination', Pagination)
 Vue.use(permission)
 
 Vue.use(dataV)
+Vue.use(vRegion)
 
 /**
  * If you don't want to use mock-server

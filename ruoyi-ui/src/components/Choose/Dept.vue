@@ -84,9 +84,8 @@
                 // this.$emit("input", this.deptChoose);
             },
             watch: {
-                deptChoose(val) {
-                    this.value = this.deptChoose;
-                    this.$emit("input", this.deptChoose);
+                value: function () {
+                    this.deptChoose = this.value;
                 }
             },
             methods: {

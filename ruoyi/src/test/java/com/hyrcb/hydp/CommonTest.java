@@ -16,6 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import com.LaunchEntry;
 import com.google.common.collect.Lists;
+import com.hyrcb.hydp.common.utils.AddressParserUtils;
 import com.hyrcb.hydp.modules.crm.domain.Custinfo1;
 import com.hyrcb.hydp.modules.crm.service.ICustinfo1Service;
 
@@ -48,7 +49,7 @@ public class CommonTest {
 	}
 	
 	
-	@Test
+//	@Test
 	public void testSaveBatch() {
 		List<Custinfo1> list = Lists.newArrayList();
 		int total = 100000;
@@ -77,5 +78,9 @@ public class CommonTest {
 		
 	}
 	
+	@Test
+	public void testAddress() {
+		AddressParserUtils.initJD();
+	}
 
 }

@@ -14,6 +14,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jfinal.plugin.activerecord.Record;
+
 import me.belucky.easytool.util.DateTimeUtils;
 
 
@@ -137,6 +139,21 @@ public class CommonUtils extends me.belucky.easytool.util.CommonUtils{
 		cal.setTime(new Date());
 		cal.add(Calendar.DATE, -1);
 		return DateTimeUtils.getDateStr(cal.getTime(), "yyyy-MM-dd");
+	}
+	
+	/**
+	 * 获取int的值
+	 * @param record
+	 * @param fieldName
+	 * @return
+	 */
+	public static int getInt(Record record, String fieldName) {
+		Object obj = record.get(fieldName);
+		int result = 0;
+		if(obj != null && !"null".equals(obj)) {
+			result = Integer.parseInt(String.valueOf(obj));
+		}
+		return result;
 	}
 	
 }

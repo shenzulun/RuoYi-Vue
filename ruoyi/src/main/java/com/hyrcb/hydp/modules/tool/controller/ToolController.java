@@ -4,11 +4,15 @@
  */
 package com.hyrcb.hydp.modules.tool.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.hyrcb.hydp.modules.tool.map.BaiduMapUtils;
 import com.hyrcb.hydp.modules.tool.map.model.BaiduMapLocation;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
 import com.ruoyi.framework.web.domain.AjaxResult;
 
 /**
@@ -25,6 +29,16 @@ public class ToolController {
 	public AjaxResult showLocation(@RequestParam(name="address") String address) {
 		BaiduMapLocation location = BaiduMapUtils.showLocationDetail(address);
 		return AjaxResult.success(location);
+	}
+	
+	@RequestMapping("/addressCodeDetail" )
+	public AjaxResult addressCodeDetail(@RequestParam(name="code") String code) {
+		List<Record> list = Db.find("select * from sys_dict_tree where type='ADDRESS_CODE' and code = ?", code);
+		if(list == null || list.size() == 0) {
+			return AjaxResult.error("地址代码不存在");
+		}else {
+			return AjaxResult.success(list.get(0).getColumns());
+		}
 	}
 
 }
