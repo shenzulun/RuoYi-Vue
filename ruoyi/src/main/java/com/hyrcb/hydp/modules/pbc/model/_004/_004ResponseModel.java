@@ -4,6 +4,8 @@
  */
 package com.hyrcb.hydp.modules.pbc.model._004;
 
+import java.util.List;
+
 /**
  * Description: 分区域融资对接情况
  * @author shenzulun
@@ -12,43 +14,44 @@ package com.hyrcb.hydp.modules.pbc.model._004;
  */
 public class _004ResponseModel {
 	
-	private String[] xAxis;
+	private List<String> xAxis;
 	
-	private int[] data_y;
+	private List<Integer> data_y;
 	
-	private int[] data_w;
+	private List<Integer> data_w;
 	
 	public _004ResponseModel() {}
 	
-	public _004ResponseModel(String[] xAxis, int[] data_y, int[] data_w) {
+	public _004ResponseModel(List<String> xAxis, List<Integer> data_y, List<Integer> data_w) {
 		super();
 		this.xAxis = xAxis;
 		this.data_y = data_y;
 		this.data_w = data_w;
 	}
 
-	public String[] getxAxis() {
+	public List<String> getxAxis() {
 		return xAxis;
 	}
 
-	public void setxAxis(String[] xAxis) {
+	public void setxAxis(List<String> xAxis) {
 		this.xAxis = xAxis;
 	}
 
-	public int[] getData_y() {
+	public List<Integer> getData_y() {
 		return data_y;
 	}
 
-	public void setData_y(int[] data_y) {
+	public void setData_y(List<Integer> data_y) {
 		this.data_y = data_y;
 	}
 
-	public int[] getData_w() {
+	public List<Integer> getData_w() {
 		return data_w;
 	}
 
-	public void setData_w(int[] data_w) {
+	public void setData_w(List<Integer> data_w) {
 		this.data_w = data_w;
 	}
+	
 	
 }

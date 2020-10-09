@@ -6,14 +6,18 @@ package com.hyrcb.hydp.modules.pbc.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.hyrcb.hydp.common.config.StaticCode;
 import com.hyrcb.hydp.common.utils.CommonUtils;
 import com.hyrcb.hydp.modules.pbc.model.CommonRequestModel;
 import com.hyrcb.hydp.modules.pbc.model._001._001ResponseModel;
 import com.hyrcb.hydp.modules.pbc.model._002._002ResponseModel;
 import com.hyrcb.hydp.modules.pbc.model._003._003ResponseModel;
+import com.hyrcb.hydp.modules.pbc.model._004._004ResponseModel;
+import com.hyrcb.hydp.modules.pbc.model._005._005ResponseModel;
 import com.hyrcb.hydp.modules.pbc.model._006._006ResponseModel;
 import com.hyrcb.hydp.modules.pbc.model._007._007ResponseItem;
 import com.hyrcb.hydp.modules.pbc.model._007._007ResponseModel;
@@ -21,6 +25,7 @@ import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Record;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
+import me.belucky.easytool.util.CacheUtils;
 import me.belucky.easytool.util.StringUtils;
 
 /**
@@ -142,8 +147,38 @@ public class PbcAPIController extends BaseController{
 	 */
 	@RequestMapping("/getFqyrzdjqk")
 	public AjaxResult getFqyrzdjqk(@ModelAttribute CommonRequestModel requestModel) {
-		
-		return AjaxResult.success();
+		List<Record> list = null;
+		if(requestModel != null && StringUtils.isNotNull(requestModel.getCustType())) {
+			list = Db.find("select t1.address_code,\r\n" + 
+					"sum(if(t2.solve_status != '3',1,0)) as ydj,\r\n" + 
+					"sum(if(t2.solve_status = '3',1,0)) as wdj\r\n" + 
+					"from pbc_custinfo t1,pbc_loan_demand t2 \r\n" + 
+					"where t1.cust_no = t2.cust_no and t1.address_code like '331003%' and t1.tag=? \r\n" + 
+					"group by t1.address_code order by count(1) desc", requestModel.getCustType());
+			
+		}else {
+			list = Db.find("select t1.address_code,\r\n" + 
+					"sum(if(t2.solve_status != '3',1,0)) as ydj,\r\n" + 
+					"sum(if(t2.solve_status = '3',1,0)) as wdj\r\n" + 
+					"from pbc_custinfo t1,pbc_loan_demand t2 \r\n" + 
+					"where t1.cust_no = t2.cust_no and t1.address_code like '331003%'\r\n" + 
+					"group by t1.address_code\r\n" + 
+					"order by count(1) desc");
+		}
+		List<String> xAxis = new ArrayList<>();
+		List<Integer> datay = new ArrayList<>();
+		List<Integer> dataw = new ArrayList<>();
+		if(list != null && list.size() > 0) {
+			ConcurrentMap<String, Record> map = CacheUtils.getCache(StaticCode.CACHE_DICT_TREE_MAP);
+			for(Record r : list) {
+				String addressCode = r.getStr("address_code");
+				xAxis.add(map.get("ADDRESS_CODE-" + addressCode).getStr("name"));
+				datay.add(r.getInt("ydj"));
+				dataw.add(r.getInt("wdj"));
+			}
+		}
+		_004ResponseModel resp = new _004ResponseModel(xAxis, datay, dataw);
+		return AjaxResult.success(resp);
 	}
 	
 	/**
@@ -153,8 +188,65 @@ public class PbcAPIController extends BaseController{
 	 */
 	@RequestMapping("/getQyrzfgqk")
 	public AjaxResult getQyrzfgqk(@ModelAttribute CommonRequestModel requestModel) {
-		
-		return AjaxResult.success();
+		List<Record> list = new ArrayList<Record>();
+		if(requestModel != null && StringUtils.isNotNull(requestModel.getCustType())) {
+			List<Record> list1 = Db.find("select \r\n" + 
+					"distinct substr(t.create_time,1,7) as rq\r\n" + 
+					"from (\r\n" + 
+					"	select min(create_time) as create_time\r\n" + 
+					"	from pbc_loan_demand t \r\n" + 
+					"	where t.cust_no in (select t2.cust_no from pbc_custinfo t2 where t2.tag=?) and t.create_time >= DATE_ADD((date_add(curdate(),interval -6 month)),interval -day(date_add(curdate(),interval -6 month))+1 day)\r\n" + 
+					"	union all\r\n" + 
+					"	select now()\r\n" + 
+					")t order by substr(t.create_time,1,7)", requestModel.getCustType());
+			if(list1 != null) {
+				for(Record r1 : list1) {
+					String rq = r1.getStr("rq");
+					String rq1 = CommonUtils.getFirstDayOfNextMonth(rq, "yyyy-MM") + "-01";
+					List<Record> list2 = Db.find("select '" + rq + "' as rq, \r\n" + 
+							"sum(if(t.solve_status = '1',t.loan_amount,0)) / sum(t.loan_amount) as 'ljfgl',\r\n" + 
+							"sum(if(t.solve_status = '1',t.loan_amount,0)) as 'ljcjje'\r\n" + 
+							"from pbc_loan_demand t \r\n" + 
+							"where t.create_time < ? and t.cust_no in (select t2.cust_no from pbc_custinfo t2 where t2.tag=?)", rq1, requestModel.getCustType());
+					list.addAll(list2);
+				}
+			}
+		}else {
+			List<Record> list1 = Db.find("select \r\n" + 
+					"distinct substr(t.create_time,1,7) as rq\r\n" + 
+					"from (\r\n" + 
+					"	select min(create_time) as create_time\r\n" + 
+					"	from pbc_loan_demand t \r\n" + 
+					"	where t.create_time >= DATE_ADD((date_add(curdate(),interval -6 month)),interval -day(date_add(curdate(),interval -6 month))+1 day)\r\n" + 
+					"	union all\r\n" + 
+					"	select now()\r\n" + 
+					")t order by substr(t.create_time,1,7)");
+			if(list1 != null) {
+				for(Record r1 : list1) {
+					String rq = r1.getStr("rq");
+					String rq1 = CommonUtils.getFirstDayOfNextMonth(rq, "yyyy-MM") + "-01";
+					List<Record> list2 = Db.find("select '" + rq + "' as rq, \r\n" + 
+							"sum(if(t.solve_status = '1',t.loan_amount,0)) / sum(t.loan_amount) as 'ljfgl',\r\n" + 
+							"sum(if(t.solve_status = '1',t.loan_amount,0)) as 'ljcjje'\r\n" + 
+							"from pbc_loan_demand t \r\n" + 
+							"where t.create_time < ?", rq1);
+					list.addAll(list2);
+					
+				}
+			}
+		}
+		List<String> xAxis = new ArrayList<>();
+		List<Double> dataFg = new ArrayList<>();
+		List<Double> dataCj = new ArrayList<>();
+		if(list != null && list.size() > 0) {
+			for(Record r : list) {
+				xAxis.add(r.getStr("rq").replaceAll("-", "."));
+				dataFg.add(r.getDouble("ljfgl"));
+				dataCj.add(r.getDouble("ljcjje"));
+			}
+		}
+		_005ResponseModel resp = new _005ResponseModel(xAxis, dataFg, dataCj);
+		return AjaxResult.success(resp);
 	}
 	
 	/**

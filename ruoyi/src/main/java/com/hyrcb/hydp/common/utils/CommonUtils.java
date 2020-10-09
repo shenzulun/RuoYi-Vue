@@ -156,5 +156,28 @@ public class CommonUtils extends me.belucky.easytool.util.CommonUtils{
 		return result;
 	}
 	
+	/**
+	 * 获取下个月的第一天
+	 * @param dateStr
+	 * @param format
+	 * @return
+	 */
+	public static String getFirstDayOfNextMonth(String dateStr, String format) {
+		String result = null;
+		SimpleDateFormat sdf = new SimpleDateFormat(format); 
+		Date date = null;
+		try {
+			date = sdf.parse(dateStr);
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date);
+			calendar.set(Calendar.DAY_OF_MONTH,1);
+			calendar.add(Calendar.MONTH, 1);
+			result = sdf.format(calendar.getTime());
+		} catch (ParseException e) {
+			log.error("",e);
+		}
+		return result;
+	}
+	
 }
 

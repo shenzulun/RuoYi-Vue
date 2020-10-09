@@ -151,7 +151,7 @@ public class PbcCustInfoTest {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void updateGeoCode() {
 		List<PbcCustinfo> list = iPbcCustinfoService.list();
 		for(PbcCustinfo pbcCust : list) {
