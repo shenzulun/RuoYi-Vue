@@ -4,6 +4,8 @@
  */
 package com.hyrcb.hydp.modules.pbc.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
@@ -47,13 +49,17 @@ public class PbcAPIController extends BaseController{
 	@RequestMapping("/getCustAnalyse" )
 	public AjaxResult getCustAnalyse(@ModelAttribute CommonRequestModel requestModel) {
 		List<Record> list = null;
-		if(requestModel != null && StringUtils.isNotNull(requestModel.getCustType())) {
+		String custType = requestModel.getCustType();
+		if("企业总数".equals(custType)) {
+			custType = null;
+		}
+		if(requestModel != null && StringUtils.isNotNull(custType)) {
 			list = Db.find("select \r\n" + 
 					"t1.tag,\r\n" + 
 					"sum(if(t2.cust_no is null,0,1)) as yrzxq,    -- 有融资需求\r\n" + 
 					"sum(if(t2.cust_no is not null,0,1)) as wrzxq   -- 无融资需求\r\n" + 
 					"from pbc_custinfo t1 left join (select distinct cust_no from pbc_loan_demand)t2 on t2.cust_no=t1.cust_no where t1.tag=? \r\n" + 
-					"group by t1.tag", requestModel.getCustType());
+					"group by t1.tag", custType);
 		}else {
 			list = Db.find("select \r\n" + 
 					"'企业总数'  as tag,\r\n" + 
@@ -121,12 +127,16 @@ public class PbcAPIController extends BaseController{
 	@RequestMapping("/getQyrzqk")
 	public AjaxResult getQyrzqk(@ModelAttribute CommonRequestModel requestModel) {
 		List<Record> list = null;
-		if(requestModel != null && StringUtils.isNotNull(requestModel.getCustType())) {
+		String custType = requestModel.getCustType();
+		if("企业总数".equals(custType)) {
+			custType = null;
+		}
+		if(requestModel != null && StringUtils.isNotNull(custType)) {
 			list = Db.find("select \r\n" + 
 					"sum(if(t1.solve_status = '1',1,0)) as yrz,\r\n" + 
 					"sum(if(t1.solve_status = '2',1,0)) as zzdj,\r\n" + 
 					"sum(if(t1.solve_status = '3',1,0)) as wdj\r\n" + 
-					"from pbc_loan_demand t1 where t1.cust_no in (select t2.cust_no from pbc_custinfo t2 where t2.tag=?)", requestModel.getCustType());
+					"from pbc_loan_demand t1 where t1.cust_no in (select t2.cust_no from pbc_custinfo t2 where t2.tag=?)", custType);
 		}else {
 			list = Db.find("select \r\n" + 
 					"sum(if(t1.solve_status = '1',1,0)) as yrz,\r\n" + 
@@ -148,13 +158,17 @@ public class PbcAPIController extends BaseController{
 	@RequestMapping("/getFqyrzdjqk")
 	public AjaxResult getFqyrzdjqk(@ModelAttribute CommonRequestModel requestModel) {
 		List<Record> list = null;
-		if(requestModel != null && StringUtils.isNotNull(requestModel.getCustType())) {
+		String custType = requestModel.getCustType();
+		if("企业总数".equals(custType)) {
+			custType = null;
+		}
+		if(requestModel != null && StringUtils.isNotNull(custType)) {
 			list = Db.find("select t1.address_code,\r\n" + 
 					"sum(if(t2.solve_status != '3',1,0)) as ydj,\r\n" + 
 					"sum(if(t2.solve_status = '3',1,0)) as wdj\r\n" + 
 					"from pbc_custinfo t1,pbc_loan_demand t2 \r\n" + 
 					"where t1.cust_no = t2.cust_no and t1.address_code like '331003%' and t1.tag=? \r\n" + 
-					"group by t1.address_code order by count(1) desc", requestModel.getCustType());
+					"group by t1.address_code order by count(1) desc", custType);
 			
 		}else {
 			list = Db.find("select t1.address_code,\r\n" + 
@@ -170,7 +184,11 @@ public class PbcAPIController extends BaseController{
 		List<Integer> dataw = new ArrayList<>();
 		if(list != null && list.size() > 0) {
 			ConcurrentMap<String, Record> map = CacheUtils.getCache(StaticCode.CACHE_DICT_TREE_MAP);
+			int i=0;
 			for(Record r : list) {
+				if(++i > 5) {
+					break;
+				}
 				String addressCode = r.getStr("address_code");
 				xAxis.add(map.get("ADDRESS_CODE-" + addressCode).getStr("name"));
 				datay.add(r.getInt("ydj"));
@@ -189,47 +207,74 @@ public class PbcAPIController extends BaseController{
 	@RequestMapping("/getQyrzfgqk")
 	public AjaxResult getQyrzfgqk(@ModelAttribute CommonRequestModel requestModel) {
 		List<Record> list = new ArrayList<Record>();
-		if(requestModel != null && StringUtils.isNotNull(requestModel.getCustType())) {
-			List<Record> list1 = Db.find("select \r\n" + 
-					"distinct substr(t.create_time,1,7) as rq\r\n" + 
-					"from (\r\n" + 
-					"	select min(create_time) as create_time\r\n" + 
-					"	from pbc_loan_demand t \r\n" + 
-					"	where t.cust_no in (select t2.cust_no from pbc_custinfo t2 where t2.tag=?) and t.create_time >= DATE_ADD((date_add(curdate(),interval -6 month)),interval -day(date_add(curdate(),interval -6 month))+1 day)\r\n" + 
-					"	union all\r\n" + 
-					"	select now()\r\n" + 
-					")t order by substr(t.create_time,1,7)", requestModel.getCustType());
-			if(list1 != null) {
-				for(Record r1 : list1) {
-					String rq = r1.getStr("rq");
+		
+		String custType = requestModel.getCustType();
+		if("企业总数".equals(custType)) {
+			custType = null;
+		}
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+		
+		LocalDate date = LocalDate.now();
+		List<String> dateList = new ArrayList<>();
+		dateList.add(date.plusMonths(-5).format(formatter));
+		dateList.add(date.plusMonths(-4).format(formatter));
+		dateList.add(date.plusMonths(-3).format(formatter));
+		dateList.add(date.plusMonths(-2).format(formatter));
+		dateList.add(date.plusMonths(-1).format(formatter));
+		dateList.add(date.plusMonths(0).format(formatter));
+		if(requestModel != null && StringUtils.isNotNull(custType)) {
+//			List<Record> list1 = Db.find("select \r\n" + 
+//					"distinct substr(t.create_time,1,7) as rq\r\n" + 
+//					"from (\r\n" + 
+//					"	select min(create_time) as create_time\r\n" + 
+//					"	from pbc_loan_demand t \r\n" + 
+//					"	where t.cust_no in (select t2.cust_no from pbc_custinfo t2 where t2.tag=?) and t.create_time >= DATE_ADD((date_add(curdate(),interval -6 month)),interval -day(date_add(curdate(),interval -6 month))+1 day)\r\n" + 
+//					"	union all\r\n" + 
+//					"	select now()\r\n" + 
+//					")t order by substr(t.create_time,1,7)", custType);		
+			
+			if(dateList != null) {
+				for(String rq : dateList) {
+//					String rq = r1.getStr("rq");
+					if(rq == null) {
+						continue;
+					}
 					String rq1 = CommonUtils.getFirstDayOfNextMonth(rq, "yyyy-MM") + "-01";
 					List<Record> list2 = Db.find("select '" + rq + "' as rq, \r\n" + 
 							"sum(if(t.solve_status = '1',t.loan_amount,0)) / sum(t.loan_amount) as 'ljfgl',\r\n" + 
 							"sum(if(t.solve_status = '1',t.loan_amount,0)) as 'ljcjje'\r\n" + 
 							"from pbc_loan_demand t \r\n" + 
-							"where t.create_time < ? and t.cust_no in (select t2.cust_no from pbc_custinfo t2 where t2.tag=?)", rq1, requestModel.getCustType());
+							"where t.create_time < ? and t.cust_no in (select t2.cust_no from pbc_custinfo t2 where t2.tag=?)", rq1, custType);
+					
+					if(list2.get(0).get("ljfgl") == null) {
+						continue;
+					}
 					list.addAll(list2);
 				}
 			}
 		}else {
-			List<Record> list1 = Db.find("select \r\n" + 
-					"distinct substr(t.create_time,1,7) as rq\r\n" + 
-					"from (\r\n" + 
-					"	select min(create_time) as create_time\r\n" + 
-					"	from pbc_loan_demand t \r\n" + 
-					"	where t.create_time >= DATE_ADD((date_add(curdate(),interval -6 month)),interval -day(date_add(curdate(),interval -6 month))+1 day)\r\n" + 
-					"	union all\r\n" + 
-					"	select now()\r\n" + 
-					")t order by substr(t.create_time,1,7)");
-			if(list1 != null) {
-				for(Record r1 : list1) {
-					String rq = r1.getStr("rq");
+//			List<Record> list1 = Db.find("select \r\n" + 
+//					"distinct substr(t.create_time,1,7) as rq\r\n" + 
+//					"from (\r\n" + 
+//					"	select min(create_time) as create_time\r\n" + 
+//					"	from pbc_loan_demand t \r\n" + 
+//					"	where t.create_time >= DATE_ADD((date_add(curdate(),interval -6 month)),interval -day(date_add(curdate(),interval -6 month))+1 day)\r\n" + 
+//					"	union all\r\n" + 
+//					"	select now()\r\n" + 
+//					")t order by substr(t.create_time,1,7)");
+			
+			if(dateList != null) {
+				for(String rq : dateList) {
+//					String rq = r1.getStr("rq");
 					String rq1 = CommonUtils.getFirstDayOfNextMonth(rq, "yyyy-MM") + "-01";
 					List<Record> list2 = Db.find("select '" + rq + "' as rq, \r\n" + 
 							"sum(if(t.solve_status = '1',t.loan_amount,0)) / sum(t.loan_amount) as 'ljfgl',\r\n" + 
 							"sum(if(t.solve_status = '1',t.loan_amount,0)) as 'ljcjje'\r\n" + 
 							"from pbc_loan_demand t \r\n" + 
 							"where t.create_time < ?", rq1);
+					if(list2.get(0).get("ljfgl") == null) {
+						continue;
+					}
 					list.addAll(list2);
 					
 				}
@@ -257,12 +302,16 @@ public class PbcAPIController extends BaseController{
 	@RequestMapping("/getFjgrzdjqk")
 	public AjaxResult getFjgrzdjqk(@ModelAttribute CommonRequestModel requestModel) {
 		List<Record> list = null;
-		if(requestModel != null && StringUtils.isNotNull(requestModel.getCustType())) {
+		String custType = requestModel.getCustType();
+		if("企业总数".equals(custType)) {
+			custType = null;
+		}
+		if(requestModel != null && StringUtils.isNotNull(custType)) {
 			list = Db.find("select t3.dept_name,count(t1.demand_no) as cnt from pbc_loan_demand t1,pbc_bankinfo t2,sys_dept t3,pbc_custinfo t4\r\n" + 
 					"where t1.solve_bank_no=t2.bank_id and t2.dept_id=t3.dept_id and t1.cust_no=t4.cust_no and t4.tag=? \r\n" + 
 					"group by t3.dept_name\r\n" + 
 					"order by count(t1.demand_no) desc", 
-					requestModel.getCustType());
+					custType);
 		}else {
 			list = Db.find("select t3.dept_name,count(t1.demand_no) as cnt from pbc_loan_demand t1,pbc_bankinfo t2,sys_dept t3 \r\n" + 
 					"where t1.solve_bank_no=t2.bank_id and t2.dept_id=t3.dept_id\r\n" + 
@@ -290,9 +339,13 @@ public class PbcAPIController extends BaseController{
 	@RequestMapping("/getQydtzb")
 	public AjaxResult getQydtzb(@ModelAttribute CommonRequestModel requestModel) {
 		List<Record> list = null;
-		if(requestModel != null && StringUtils.isNotNull(requestModel.getCustType())) {
+		String custType = requestModel.getCustType();
+		if("企业总数".equals(custType)) {
+			custType = null;
+		}
+		if(requestModel != null && StringUtils.isNotNull(custType)) {
 			list = Db.find("select t1.cust_no,t1.cust_name,t1.geo_code,t2.solve_status from pbc_custinfo t1,pbc_loan_demand t2 where t1.cust_no = t2.cust_no and t1.tag=?", 
-					requestModel.getCustType());
+					custType);
 		}else {
 			list = Db.find("select t1.cust_no,t1.cust_name,t1.geo_code,t2.solve_status from pbc_custinfo t1,pbc_loan_demand t2 where t1.cust_no = t2.cust_no");
 		}

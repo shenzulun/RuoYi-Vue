@@ -29,6 +29,10 @@ public class RuoYiConfig
 
     /** 获取地址开关 */
     private static boolean addressEnabled;
+    /**
+     * 资源文件的下载路径
+     */
+    private static String profileUrl;
 
     public String getName()
     {
@@ -90,7 +94,15 @@ public class RuoYiConfig
         RuoYiConfig.addressEnabled = addressEnabled;
     }
 
-    /**
+    public static String getProfileUrl() {
+		return profileUrl;
+	}
+
+	public static void setProfileUrl(String profileUrl) {
+		RuoYiConfig.profileUrl = profileUrl;
+	}
+
+	/**
      * 获取头像上传路径
      */
     public static String getAvatarPath()

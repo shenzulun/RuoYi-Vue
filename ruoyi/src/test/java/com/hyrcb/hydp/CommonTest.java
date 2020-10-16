@@ -4,6 +4,9 @@
  */
 package com.hyrcb.hydp;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -31,8 +34,8 @@ import me.belucky.easytool.util.IDCardGenerateUtil;
  * @date 2020-05-19
  * @version 1.0
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = LaunchEntry.class)
+//@RunWith(SpringRunner.class)
+//@SpringBootTest(classes = LaunchEntry.class)
 //@Transactional
 public class CommonTest {
 	
@@ -78,9 +81,21 @@ public class CommonTest {
 		
 	}
 	
-	@Test
+//	@Test
 	public void testAddress() {
 		AddressParserUtils.initJD();
+	}
+	
+	@Test
+	public void test1() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+		
+		LocalDate date = LocalDate.now();
+		System.out.println(date.format(formatter));
+		
+		LocalDate date1 = date.plusMonths(-1);
+		System.out.println(date1.format(formatter));
+		
 	}
 
 }
