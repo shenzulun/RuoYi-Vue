@@ -385,6 +385,7 @@ body, html{
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;
+  overflow: auto !important;
 }
 
 input, textarea{

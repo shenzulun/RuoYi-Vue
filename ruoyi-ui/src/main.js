@@ -21,7 +21,7 @@ import { getConfigKey } from "@/api/system/config";
 import { parseTime, resetForm, addDateRange, selectDictLabel, download, handleTree } from "@/utils/ruoyi";
 import Pagination from "@/components/Pagination";
 
-import dataV from '@jiaminghi/data-view';
+//import dataV from '@jiaminghi/data-view';
 import vRegion from 'v-region'
 
 // 全局方法挂载
@@ -51,7 +51,7 @@ Vue.component('Pagination', Pagination)
 
 Vue.use(permission)
 
-Vue.use(dataV)
+//Vue.use(dataV)
 Vue.use(vRegion)
 
 /**

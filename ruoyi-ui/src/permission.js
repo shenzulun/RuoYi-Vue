@@ -16,7 +16,9 @@ router.beforeEach((to, from, next) => {
     if (to.path === '/login') {
       next({ path: '/' })
       NProgress.done()
-    } else {
+    } else if(to.path.startsWith('/profile/upload')){
+      next();
+    }else {
       if (store.getters.roles.length === 0) {
         // 判断当前用户是否已拉取完user_info信息
         store.dispatch('GetInfo').then(res => {
@@ -60,5 +62,7 @@ router.beforeEach((to, from, next) => {
 })
 
 router.afterEach(() => {
+  //bugfix
+  document.querySelector("body").setAttribute("style", "overflow: auto !important;");
   NProgress.done()
 })

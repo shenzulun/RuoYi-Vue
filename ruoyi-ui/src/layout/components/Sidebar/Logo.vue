@@ -26,7 +26,7 @@ export default {
   },
   data() {
     return {
-      title: '人行三色图',
+      title: '融资三色图',
       logo: logoImg
     }
   }
