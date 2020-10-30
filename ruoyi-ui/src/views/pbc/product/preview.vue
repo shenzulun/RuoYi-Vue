@@ -1,11 +1,11 @@
 <template>
     <div>
-        <el-container v-if="article.isPdf == '0'">
+        <el-container v-if="product.isPdf == '0'">
             <el-header height="30%">
-              <h1>{{ article.title }}</h1>
+              <h1>{{ product.name }}</h1>
             </el-header>
             <el-main height="65%">
-                <div v-html="article.content"></div>
+                <div v-html="product.content"></div>
             </el-main>
             <el-footer height="5%"></el-footer>
         </el-container>
@@ -31,11 +31,11 @@
 </style>
 
 <script>
-import { listArticle, getArticle } from "@/api/pbc/article";
+import { listProduct, getProduct } from "@/api/pbc/product";
 import pdf from 'vue-pdf';
 
 export default {
-  name: "ArticlePreview",
+  name: "productPreview",
   metaInfo: {
       // title will be injected into parent titleTemplate
       title: ''
@@ -46,47 +46,33 @@ export default {
   data() {
     return {
       // 信息类型字典
-      articleTypeOptions: [],
+      productTypeOptions: [],
       // 发布状态字典
-      articleStatusOptions: [],
-      article: [],
+      productStatusOptions: [],
+      product: [],
       pdfURL: ""
     };
   },
   created() {
     let parmas = this.$route.query;
     console.log(parmas.id);
-    this.getArticle0(parmas.id);
-    // this.getDicts("ARTICLE_TYPE").then(response => {
-    //   this.articleTypeOptions = response.data;
-    // });
-    // this.getDicts("POST_STATUS").then(response => {
-    //   this.articleStatusOptions = response.data;
-    // });
+    this.getProduct0(parmas.id);
   },
   methods: {
     /** 查询文章信息列表 */
-    getArticle0(id) {
-        getArticle(id).then(response => {
-            this.article = response.data;
-            document.title = this.article.title;
+    getProduct0(id) {
+        getProduct(id).then(response => {
+            this.product = response.data;
+            document.title = this.product.name;
 
-            if(this.article.isPdf == '1'){
-              let acc = this.article.accessoryUrl;
+            if(this.product.isPdf == '1'){
+              let acc = this.product.accessoryUrl;
               if(acc != null && acc != ''){
                 let arr2 = acc.split(',')[0].split('|');
                 this.pdfURL = arr2[1];
               }
             }
         });
-    },
-    // 信息类型字典翻译
-    articleTypeFormat(row, column) {
-      return this.selectDictLabel(this.articleTypeOptions, row.articleType);
-    },
-    // 发布状态字典翻译
-    articleStatusFormat(row, column) {
-      return this.selectDictLabel(this.articleStatusOptions, row.articleStatus);
     }
   }
 };

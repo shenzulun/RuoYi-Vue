@@ -151,6 +151,11 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/input/product/preview',
+    component: (resolve) => require(['@/views/pbc/product/preview'], resolve),
+    hidden: true
+  },
+  {
     path: '/choose/custno',
     component: (resolve) => require(['@/components/Choose/Custno'], resolve),
     hidden: true

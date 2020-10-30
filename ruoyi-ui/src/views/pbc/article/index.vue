@@ -135,6 +135,12 @@
     <!-- 添加或修改发文信息对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="80%" height="60%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
+          <el-form-item label="所属机构" prop="deptId" v-show="loginUserName=='admin'">
+              <!--
+              <el-input v-model="form.deptId" placeholder="请输入所属机构" />
+              -->
+              <Dept v-model="form.deptId"></Dept>
+        </el-form-item>
         <el-form-item label="信息类型">
           <el-select v-model="form.articleType" placeholder="请选择信息类型">
             <el-option
@@ -205,12 +211,14 @@
 import { listArticle, getArticle, delArticle, addArticle, updateArticle, exportArticle } from "@/api/pbc/article";
 import {listDept, listDeptAsync, getDept} from "@/api/system/dept";
 import Editor from '@/components/Editor';
-import { getToken } from '@/utils/auth'
+import { getToken } from '@/utils/auth';
+import Dept from "@/components/Choose/Dept";
+import store from '@/store';
 
 export default {
   name: "Article",
   components: {
-    Editor
+    Editor,Dept
   },
   data() {
     return {
@@ -256,7 +264,8 @@ export default {
       uploadUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传服务器地址
       headers: {
         Authorization: 'Bearer ' + getToken()
-      }
+      },
+      loginUserName: ""
     };
   },
   created() {
@@ -270,6 +279,7 @@ export default {
     this.getDicts("YES_OR_NOT").then(response => {
       this.yesOrNotOptions = response.data;
     });
+    this.loginUserName = store.getters.name;
   },
   methods: {
     /** 查询发文信息列表 */
@@ -335,6 +345,8 @@ export default {
       this.open = true;
       this.title = "添加发文信息";
       this.fileList = [];
+      this.form.articleStatus = '1';
+      this.form.isPdf = '0';
     },
     /** 修改按钮操作 */
     handleUpdate(row) {

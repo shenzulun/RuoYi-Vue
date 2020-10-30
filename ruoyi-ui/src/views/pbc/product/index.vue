@@ -85,7 +85,11 @@
       <el-table-column label="所属机构" align="center" prop="deptName" />
       <el-table-column label="产品类型" align="center" prop="productType" :formatter="productTypeFormat" />
       <el-table-column label="产品名称" align="center" prop="name" />
+      <!--
       <el-table-column label="内容" align="center" prop="content" />
+      -->
+      <el-table-column label="是否PDF" align="center" prop="isPdf" v-if="false"/>
+      <el-table-column label="附件URL" align="center" prop="accessoryUrl" v-if="false"/>
       <el-table-column label="发布状态" align="center" prop="productStatus" :formatter="productStatusFormat" />
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
         <template slot-scope="scope">
@@ -99,6 +103,12 @@
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
+            <el-button
+            size="mini"
+            type="text"
+            icon="el-icon-document"
+            @click="handlePreview(scope.row)"
+          >预览</el-button>
           <el-button
             size="mini"
             type="text"
@@ -128,7 +138,7 @@
     <!-- 添加或修改贷款产品对话框 -->
     <el-dialog :title="title" :visible.sync="open"  width="80%" height="60%" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="所属机构" prop="deptId">
+        <el-form-item label="所属机构" prop="deptId" v-show="loginUserName=='admin'">
           <!--
           <el-input v-model="form.deptId" placeholder="请输入所属机构" />
           -->
@@ -147,12 +157,44 @@
         <el-form-item label="产品名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入产品名称" />
         </el-form-item>
-        <el-form-item label="内容" prop="content">
+        <el-form-item label="是否PDF" prop="isPdf">
+          <el-select v-model="form.isPdf" placeholder="请选择是否PDF" @change="isPdfOnChange">
+            <el-option
+              v-for="dict in yesOrNotOptions"
+              :key="dict.dictValue"
+              :label="dict.dictLabel"
+              :value="dict.dictValue"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form-item>
+        <el-form-item label="内容" prop="content" v-show="form.isPdf != '1'">
           <!--
           <el-input v-model="form.content" type="textarea" placeholder="请输入内容" />
           -->
           <Editor v-model="form.content" />
         </el-form-item>
+        <el-form-item label="PDF上传" prop="accessoryUrl" v-show="form.isPdf == '1'">
+          <el-upload
+            class="avatar-uploader"
+            :action="uploadUrl"
+            :headers="headers"
+            :on-preview="handleOnPreview"
+            :on-remove="handleRemove"
+            :before-remove="beforeRemove"
+            :before-upload="handleUploadBefore"
+            multiple
+            accept=".pdf"
+            :limit="1"
+            :on-success="handleUploadSuccess"
+            :on-error="handleUploadError"
+            :on-exceed="handleExceed"
+            :file-list="fileList">
+            <el-button size="small" type="primary">点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传pdf文件</div>
+          </el-upload>
+          <el-input v-model="form.accessoryUrl" v-show="false" />
+      </el-form-item>
         <el-form-item label="发布状态">
           <el-select v-model="form.productStatus" placeholder="请选择发布状态">
             <el-option
@@ -176,6 +218,8 @@
 import { listProduct, getProduct, delProduct, addProduct, updateProduct, exportProduct } from "@/api/pbc/product";
 import Dept from "@/components/Choose/Dept";
 import Editor from '@/components/Editor';
+import { getToken } from '@/utils/auth';
+import store from '@/store';
 
 export default {
   name: "Product",
@@ -204,6 +248,8 @@ export default {
       productTypeOptions: [],
       // 发布状态字典
       productStatusOptions: [],
+      // 是否字典
+      yesOrNotOptions: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -216,7 +262,13 @@ export default {
       form: {},
       // 表单校验
       rules: {
-      }
+      },
+      fileList: [],
+      uploadUrl: process.env.VUE_APP_BASE_API + "/common/upload", // 上传服务器地址
+      headers: {
+        Authorization: 'Bearer ' + getToken()
+      },
+      loginUserName: ""
     };
   },
   created() {
@@ -227,6 +279,10 @@ export default {
     this.getDicts("POST_STATUS").then(response => {
       this.productStatusOptions = response.data;
     });
+    this.getDicts("YES_OR_NOT").then(response => {
+      this.yesOrNotOptions = response.data;
+    });
+    this.loginUserName = store.getters.name;
   },
   methods: {
     /** 查询贷款产品列表 */
@@ -259,6 +315,8 @@ export default {
         productType: undefined,
         name: undefined,
         content: undefined,
+        accessoryUrl: undefined,
+        isPdf: undefined,
         productStatus: undefined,
         status: "0",
         createUser: undefined,
@@ -289,6 +347,8 @@ export default {
       this.reset();
       this.open = true;
       this.title = "添加贷款产品";
+      this.form.productStatus = '1';
+      this.form.isPdf = '0';
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
@@ -296,6 +356,15 @@ export default {
       const id = row.id || this.ids
       getProduct(id).then(response => {
         this.form = response.data;
+        let acc = this.form.accessoryUrl;
+        if(acc != null && acc != ''){
+          let arr1 = acc.split(',');
+          for(let a1 of arr1){
+            let arr2 = a1.split('|');
+            var obj1 = {name: arr2[0],url: arr2[1]};
+            this.fileList.push(obj1);
+          }
+        }
         this.open = true;
         this.title = "修改贷款产品";
       });
@@ -350,6 +419,89 @@ export default {
         }).then(response => {
           this.download(response.msg);
         }).catch(function() {});
+    },
+    /** 预览 **/
+    handlePreview(row) {
+      if(row.isPdf == '1'){
+        //pdf直接显示附件
+        // let acc = row.accessoryUrl;
+        // if(acc != null && acc != ''){
+        //   let arr1 = acc.split(',');
+        //   let url = "";
+        //   for(let a1 of arr1){
+        //     let arr2 = a1.split('|');
+        //     var win1 = window.open(arr2[1], '_blank');
+        //     win1.document.title=arr2[0];
+        //   }
+        // }else{
+        //   this.$message.error("没有附件，无法预览");
+        //   return false;
+        // }
+        const id = row.id;
+        let routeData = this.$router.resolve({ 
+            path: '/input/product/preview',
+            query: {id: row.id},
+        });
+        window.open(routeData.href, '_blank');
+      }else{
+        const id = row.id;
+        let routeData = this.$router.resolve({ 
+            path: '/input/product/preview',
+            query: {id: row.id},
+        });
+        window.open(routeData.href, '_blank');
+      }
+    },
+    isPdfOnChange(val){
+      if(val == '1'){
+        //是
+
+      }else if(val == '0'){
+        //否
+
+      }
+    },
+    //删除附件
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+      this.form.accessoryUrl = null;
+    },
+    //预览附件
+    handleOnPreview(file, fileList){
+      // let routeData = this.$router.resolve({ 
+      //     path: file.url
+      // });
+      window.open(file.url, '_blank');
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      return false;
+    },
+    beforeRemove(file, fileList) {
+      // return this.$confirm(`确定移除 ${ file.name }？`);
+      return true;
+    },
+    handleUploadBefore(file) {
+      let fileType = file.type;
+      console.log(fileType);
+			if(fileType === 'application/pdf'){
+				return true;
+			}else {
+				this.$message.error('只能上传pdf');
+				return false;
+			}
+    },
+    handleUploadSuccess(res, file) {
+      // 如果上传成功
+      if (res.code == 200) {
+        this.form.accessoryUrl = file.name + "|" + res.url;
+      } else {
+        this.$message.error("文件上传失败");
+      }
+    },
+    handleUploadError() {
+      // loading动画消失
+      this.$message.error("文件上传失败");
     }
   }
 };
