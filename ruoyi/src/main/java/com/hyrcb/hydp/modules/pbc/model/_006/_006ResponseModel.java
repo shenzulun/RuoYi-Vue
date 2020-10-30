@@ -7,6 +7,9 @@ package com.hyrcb.hydp.modules.pbc.model._006;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hyrcb.hydp.common.utils.DoubleSerializerUtils;
+
 /**
  * Description: 分机构融资对接情况
  * @author shenzulun
@@ -17,14 +20,18 @@ public class _006ResponseModel {
 	
 	private List<String> xAxis = new ArrayList<>();
 	
-	private List<Integer> data = new ArrayList<>();
+	@JsonSerialize(using = DoubleSerializerUtils.class)
+	private List<Double> data = new ArrayList<>();
+	
+	private List<Integer> data_bs = new ArrayList<>();
 	
 	public _006ResponseModel() {}
 	
-	public _006ResponseModel(List<String> xAxis, List<Integer> data) {
+	public _006ResponseModel(List<String> xAxis, List<Double> data, List<Integer> data_bs) {
 		super();
 		this.xAxis = xAxis;
 		this.data = data;
+		this.data_bs = data_bs;
 	}
 
 	public List<String> getxAxis() {
@@ -35,12 +42,20 @@ public class _006ResponseModel {
 		this.xAxis = xAxis;
 	}
 
-	public List<Integer> getData() {
+	public List<Double> getData() {
 		return data;
 	}
 
-	public void setData(List<Integer> data) {
+	public void setData(List<Double> data) {
 		this.data = data;
+	}
+
+	public List<Integer> getData_bs() {
+		return data_bs;
+	}
+
+	public void setData_bs(List<Integer> data_bs) {
+		this.data_bs = data_bs;
 	}
 	
 }

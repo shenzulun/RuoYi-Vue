@@ -15,6 +15,8 @@ public class CommonRequestModel {
 	private String dataDt;
 	
 	private String custType;
+	
+	private String addressCode;
 
 	public String getDataDt() {
 		return dataDt;
@@ -31,5 +33,14 @@ public class CommonRequestModel {
 	public void setCustType(String custType) {
 		this.custType = custType;
 	}
+
+	public String getAddressCode() {
+		return addressCode;
+	}
+
+	public void setAddressCode(String addressCode) {
+		this.addressCode = addressCode;
+	}
+	
 
 }

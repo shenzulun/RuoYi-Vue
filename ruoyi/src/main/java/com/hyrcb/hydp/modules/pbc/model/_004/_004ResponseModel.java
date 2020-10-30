@@ -20,6 +20,8 @@ public class _004ResponseModel {
 	
 	private List<Integer> data_w;
 	
+	private List<Integer> data_zzdj;
+	
 	public _004ResponseModel() {}
 	
 	public _004ResponseModel(List<String> xAxis, List<Integer> data_y, List<Integer> data_w) {
@@ -27,6 +29,14 @@ public class _004ResponseModel {
 		this.xAxis = xAxis;
 		this.data_y = data_y;
 		this.data_w = data_w;
+	}
+	
+	public _004ResponseModel(List<String> xAxis, List<Integer> data_y, List<Integer> data_w, List<Integer> data_zzdj) {
+		super();
+		this.xAxis = xAxis;
+		this.data_y = data_y;
+		this.data_w = data_w;
+		this.data_zzdj = data_zzdj;
 	}
 
 	public List<String> getxAxis() {
@@ -52,6 +62,13 @@ public class _004ResponseModel {
 	public void setData_w(List<Integer> data_w) {
 		this.data_w = data_w;
 	}
-	
+
+	public List<Integer> getData_zzdj() {
+		return data_zzdj;
+	}
+
+	public void setData_zzdj(List<Integer> data_zzdj) {
+		this.data_zzdj = data_zzdj;
+	}
 	
 }

@@ -35,7 +35,9 @@ public class PbcLoanDemandServiceImpl extends ServiceImpl<PbcLoanDemandMapper, P
 		if(pbcLoanDemand.getCreateUser() == null) {
 			pbcLoanDemand.setCreateUser(SecurityUtils.getUsername());
 		}
-		pbcLoanDemand.setCreateTime(new Date());
+		if(pbcLoanDemand.getCreateTime() == null) {
+			pbcLoanDemand.setCreateTime(new Date());
+		}
 		pbcLoanDemand.setDemandNo(getDemandNo());
 		pbcLoanDemand.setStatus("1");
 		return save(pbcLoanDemand);

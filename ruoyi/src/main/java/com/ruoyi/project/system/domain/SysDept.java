@@ -29,6 +29,11 @@ public class SysDept extends BaseEntity
 
     /** 部门名称 */
     private String deptName;
+    
+    /**
+     * 部门编号
+     */
+    private String deptNo;
 
     /** 显示顺序 */
     private String orderNum;
@@ -187,6 +192,7 @@ public class SysDept extends BaseEntity
             .append("parentId", getParentId())
             .append("ancestors", getAncestors())
             .append("deptName", getDeptName())
+            .append("deptNo", getDeptNo())
             .append("orderNum", getOrderNum())
             .append("leader", getLeader())
             .append("phone", getPhone())
@@ -199,4 +205,13 @@ public class SysDept extends BaseEntity
             .append("updateTime", getUpdateTime())
             .toString();
     }
+
+	public String getDeptNo() {
+		return deptNo;
+	}
+
+	public void setDeptNo(String deptNo) {
+		this.deptNo = deptNo;
+	}
+    
 }

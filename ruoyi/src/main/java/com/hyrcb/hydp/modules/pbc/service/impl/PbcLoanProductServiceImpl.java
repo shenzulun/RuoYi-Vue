@@ -25,6 +25,11 @@ public class PbcLoanProductServiceImpl extends ServiceImpl<PbcLoanProductMapper,
 		}
 		pbcLoanProduct.setCreateTime(new Date());
 		pbcLoanProduct.setStatus("1");
+		Long deptId = pbcLoanProduct.getDeptId();
+		if(deptId == null || deptId == 0L) {
+			deptId = SecurityUtils.getLoginUser().getUser().getDeptId();
+		}
+		pbcLoanProduct.setDeptId(deptId);
 		return save(pbcLoanProduct);
 	}
 

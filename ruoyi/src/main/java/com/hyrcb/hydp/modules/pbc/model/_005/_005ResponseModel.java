@@ -4,7 +4,11 @@
  */
 package com.hyrcb.hydp.modules.pbc.model._005;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.hyrcb.hydp.common.utils.DoubleSerializerUtils;
 
 /**
  * Description: 企业融资覆盖情况
@@ -14,11 +18,13 @@ import java.util.List;
  */
 public class _005ResponseModel {
 	
-	private List<String> xAxis;
+	private List<String> xAxis = new ArrayList<>();
 	
-	private List<Double> data_fg;
+	@JsonSerialize(using = DoubleSerializerUtils.class)
+	private List<Double> data_fg = new ArrayList<>();
 	
-	private List<Double> data_cj;
+	@JsonSerialize(using = DoubleSerializerUtils.class)
+	private List<Double> data_cj = new ArrayList<>();
 	
 	public _005ResponseModel() {}
 	

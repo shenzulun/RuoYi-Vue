@@ -42,6 +42,12 @@ public class PbcLoanProduct implements Serializable {
     /** 内容 */
     @Excel(name = "内容")
     private String content;
+    
+    /** 附件 */
+    private String accessoryUrl;
+    
+    /** 是否PDF */
+    private String isPdf;
 
     /** 发布状态 */
     @Excel(name = "发布状态")
@@ -157,5 +163,22 @@ public class PbcLoanProduct implements Serializable {
 	public void setDeptName(String deptName) {
 		this.deptName = deptName;
 	}
+
+	public String getAccessoryUrl() {
+		return accessoryUrl;
+	}
+
+	public void setAccessoryUrl(String accessoryUrl) {
+		this.accessoryUrl = accessoryUrl;
+	}
+
+	public String getIsPdf() {
+		return isPdf;
+	}
+
+	public void setIsPdf(String isPdf) {
+		this.isPdf = isPdf;
+	}
+	
     
 }

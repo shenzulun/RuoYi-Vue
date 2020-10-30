@@ -4,6 +4,11 @@
  */
 package com.hyrcb.hydp.modules.pbc;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -39,10 +44,12 @@ public class PbcLoanDemandTest {
 		// 2. 查询出所有的银行信息
 		List<Record> bankList = Db.find("select bank_id from pbc_bankinfo");
 		
-		int generateSize = 1000;
+		int generateSize = 500;
 		String[] bzfs = {"1","2","3","4"};   //担保方式
 		
-		String[] jjzt = {"1","2","3"};  //融资解决状态
+		String[] jjzt = {"1","2","3","1","1"};  //融资解决状态
+		
+		LocalDateTime now = LocalDateTime.now();
 		
 		for(int i=0;i<generateSize;i++) {
 			PbcLoanDemand pbcLoanDemand = new PbcLoanDemand();
@@ -63,6 +70,9 @@ public class PbcLoanDemandTest {
 			pbcLoanDemand.setSolveStatus(jjzt[new Random().nextInt(jjzt.length)]);
 			
 			pbcLoanDemand.setCreateUser("admin");
+			int x = i % 10;
+			LocalDateTime newDate = now.plus(0 - x, ChronoUnit.MONTHS);
+			pbcLoanDemand.setCreateTime(Date.from(newDate.atZone(ZoneId.systemDefault()).toInstant()));
 			iPbcLoanDemandService.addPbcLoanDemand(pbcLoanDemand);
 			System.out.println(custNo);
 		}
