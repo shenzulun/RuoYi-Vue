@@ -44,10 +44,10 @@ public class PbcLoanDemandTest {
 		// 2. 查询出所有的银行信息
 		List<Record> bankList = Db.find("select bank_id from pbc_bankinfo");
 		
-		int generateSize = 500;
+		int generateSize = 10;
 		String[] bzfs = {"1","2","3","4"};   //担保方式
 		
-		String[] jjzt = {"1","2","3","1","1"};  //融资解决状态
+		String[] jjzt = {"1","2","3","1","1","1","1"};  //融资解决状态
 		
 		LocalDateTime now = LocalDateTime.now();
 		
@@ -71,8 +71,8 @@ public class PbcLoanDemandTest {
 			
 			pbcLoanDemand.setCreateUser("admin");
 			int x = i % 10;
-			LocalDateTime newDate = now.plus(0 - x, ChronoUnit.MONTHS);
-			pbcLoanDemand.setCreateTime(Date.from(newDate.atZone(ZoneId.systemDefault()).toInstant()));
+			//LocalDateTime newDate = now.plus(0 - x, ChronoUnit.MONTHS);
+			pbcLoanDemand.setCreateTime(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()));
 			iPbcLoanDemandService.addPbcLoanDemand(pbcLoanDemand);
 			System.out.println(custNo);
 		}

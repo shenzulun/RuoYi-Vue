@@ -91,7 +91,7 @@ public class PbcAPIController extends BaseController{
 					"sum(if(t2.cust_no is not null,0,1)) as wrzxq   -- 无融资需求\r\n" + 
 					"from pbc_custinfo t1 left join (select distinct cust_no from pbc_loan_demand)t2 on t2.cust_no=t1.cust_no where 1=1 \r\n" + 
 					baseSql.toString() + 
-					"group by t1.tag\r\n" + 
+					"group by t1.tag order by (yrzxq + wrzxq) desc  \r\n" + 
 					"", whereList1.toArray());
 		}
 		int length = list.size();
