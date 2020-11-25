@@ -170,6 +170,16 @@ export const constantRoutes = [
     component: (resolve) => require(['@/components/Choose/Dept'], resolve),
     hidden: true
   },
+  {
+    path: '/sst/report',
+    component: (resolve) => require(['@/views/pbc/sst/report'], resolve),
+    hidden: true
+  },
+  {
+    path: '/sst/login',
+    component: (resolve) => require(['@/views/pbc/sst/login'], resolve),
+    hidden: true
+  }
 ]
 
 export default new Router({

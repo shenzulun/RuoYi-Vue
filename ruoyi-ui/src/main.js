@@ -54,6 +54,20 @@ Vue.use(permission)
 //Vue.use(dataV)
 Vue.use(vRegion)
 
+import echarts from 'echarts'
+import scroll from 'vue-seamless-scroll'
+Vue.use(scroll)
+import http from '@/assets/js/http.js'
+import {post, get, put, del} from '@/assets/js/http.js'
+Vue.prototype.$http = http // 定义全局方法
+Vue.prototype.$post = post // 定义全局post方法
+Vue.prototype.$get = get // 定义全局get方法
+Vue.prototype.$put = put // 定义全局get方法
+Vue.prototype.$del = del // 定义全局get方法
+Vue.prototype.$echarts = echarts // 全局echart
+
+import '@/assets/stylus/index.styl'
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
