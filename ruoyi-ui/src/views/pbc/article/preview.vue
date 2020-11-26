@@ -57,12 +57,6 @@ export default {
     let parmas = this.$route.query;
     console.log(parmas.id);
     this.getArticle0(parmas.id);
-    // this.getDicts("ARTICLE_TYPE").then(response => {
-    //   this.articleTypeOptions = response.data;
-    // });
-    // this.getDicts("POST_STATUS").then(response => {
-    //   this.articleStatusOptions = response.data;
-    // });
   },
   methods: {
     /** 查询文章信息列表 */
@@ -79,14 +73,6 @@ export default {
               }
             }
         });
-    },
-    // 信息类型字典翻译
-    articleTypeFormat(row, column) {
-      return this.selectDictLabel(this.articleTypeOptions, row.articleType);
-    },
-    // 发布状态字典翻译
-    articleStatusFormat(row, column) {
-      return this.selectDictLabel(this.articleStatusOptions, row.articleStatus);
     }
   }
 };

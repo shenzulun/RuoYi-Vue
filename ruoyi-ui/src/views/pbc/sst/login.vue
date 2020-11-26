@@ -54,9 +54,9 @@
           </div>
         </div>
         <div class="bottom">
-          <div class="item btn1" @click="openLoginForm"></div>
-          <div class="item btn2" @click="openLoginForm"></div>
-          <div class="item btn3" @click="openLoginForm"></div>
+          <div class="item btn1" @click="openLoginForm(1)"></div>
+          <div class="item btn2" @click="openLoginForm(2)"></div>
+          <div class="item btn3" @click="openLoginForm(3)"></div>
         </div>
       </div>
       <div class="right">
@@ -99,7 +99,8 @@
       </div>
     </div>
 
-    <el-dialog :title="loginTitle" :visible.sync="open" width="500px" append-to-body>
+    <!--登录功能-->
+    <el-dialog :title="loginTitle" :visible.sync="open" width="500px" top="20vh !important" append-to-body>
       <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
         <el-form-item prop="username">
           <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
@@ -128,10 +129,81 @@
             <span v-if="!loading">登 录</span>
             <span v-else>登 录 中...</span>
           </el-button>
+          <el-link @click.native="openRegisterForm" :underline="false" style="float: right;" v-show="loginType==2">注册</el-link>
         </el-form-item>
       </el-form>
     </el-dialog>
+    
 
+    <!--注册功能-->
+    <el-dialog :title="registerTitle" :visible.sync="registerShow" width="500px" top="20vh !important" append-to-body>
+      <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="login-form" label-width="80px">
+
+        <el-form-item prop="userName" label="用户名">
+          <el-input v-model="registerForm.userName" type="text" auto-complete="off" placeholder="登录账号">
+            <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
+          </el-input>
+        </el-form-item>
+
+        <el-form-item prop="password" label="密码">
+          <el-input
+            v-model="registerForm.password"
+            type="password"
+            auto-complete="off"
+            placeholder="请输入密码..."
+            @keyup.enter.native="handleLogin"
+          >
+            <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
+          </el-input>
+        </el-form-item>
+
+        <el-form-item prop="nickName" label="企业名称">
+            <el-input v-model="registerForm.nickName" type="text" auto-complete="off" placeholder="企业名称">
+              <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
+            </el-input>
+        </el-form-item>
+
+        <el-form-item prop="contactPerson" label="联系人">
+            <el-input v-model="registerForm.contactPerson" type="text" auto-complete="off" placeholder="联系人">
+              <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon" />
+            </el-input>
+        </el-form-item>
+
+        <el-form-item prop="contactPhone" label="联系方式">
+            <el-input v-model="registerForm.contactPhone" type="text" auto-complete="off" placeholder="联系方式">
+              <svg-icon slot="prefix" icon-class="phone" class="el-input__icon input-icon" />
+            </el-input>
+        </el-form-item>
+        
+        <el-form-item prop="code" label="验证码">
+          <el-input
+            v-model="registerForm.code"
+            auto-complete="off"
+            placeholder="验证码"
+            style="width: 63%"
+            @keyup.enter.native="handleRegister"
+          >
+            <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
+          </el-input>
+          <div class="login-code">
+            <img :src="codeUrl" @click="getCode" />
+          </div>
+        </el-form-item>
+
+        <el-form-item style="width:100%;">
+          <el-button
+            :loading="loading_register"
+            size="medium"
+            type="primary"
+            style="width:100%;"
+            @click.native.prevent="handleRegister"
+          >
+            <span v-if="!loading_register">注册</span>
+            <span v-else>注 册 中...</span>
+          </el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -165,6 +237,8 @@ import vueSeamlessScroll from 'vue-seamless-scroll'
 import Cookies from "js-cookie";
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 import store from '@/store';
+import { getCodeImg } from "@/api/login";
+import { registerUser } from "@/api/register";
 
 let targetName = '茅畲乡'
 let geoCoordMap = {
@@ -277,7 +351,41 @@ export default {
       },
       loading: false,
       loginTitle: '',
-      redirect: undefined
+      redirect: undefined,
+      loading_register: false,
+      loginType: 1,
+      registerTitle: '注册',
+      registerShow: false,
+      registerForm: {
+        userName: "",
+        password: "",
+        rememberMe: false,
+        code: "",
+        uuid: "",
+        nickName: "",
+        contactPerson: "",
+        contactPhone: ""
+      },
+      registerRules: {
+        userName: [
+          { required: true, trigger: "blur", message: "用户名不能为空" }
+        ],
+        password: [
+          { required: true, trigger: "blur", message: "密码不能为空" }
+        ],
+        code: [{ required: true, trigger: "change", message: "验证码不能为空" }],
+        nickName: [
+          { required: true, trigger: "blur", message: "企业名称不能为空" }
+        ],
+        contactPerson: [
+          { required: true, trigger: "blur", message: "联系人不能为空" }
+        ],
+        contactPhone: [
+          { required: true, trigger: "blur", message: "联系电话不能为空" }
+        ]
+      },
+      codeUrl: "",
+      cookiePassword: ""
     }
   },
   created () {
@@ -299,16 +407,28 @@ export default {
     }
   },
   methods: {
+    getCode() {
+      getCodeImg().then(res => {
+        this.codeUrl = "data:image/gif;base64," + res.img;
+        this.registerForm.uuid = res.uuid;
+      });
+    },
     /** 打开登录窗口 */
-    openLoginForm() {
+    openLoginForm(loginType) {
       // 先判断是否已经登录
       if(store.getters.name != null && store.getters.name != ''){
         this.$router.push({ path: this.redirect || "/" });
       }else{
+        this.loginType = loginType;
         this.loginTitle = '登录入口';
         this.open = true;
       }
     },
+    openRegisterForm() {
+      this.open = false;
+      this.registerShow = true;
+      this.getCode();
+    }, 
     getCookie() {
       const username = Cookies.get("username");
       const password = Cookies.get("password");
@@ -341,6 +461,21 @@ export default {
               this.loading = false;
               //this.getCode();
             });
+        }
+      });
+    },
+    handleRegister() {
+      this.$refs.registerForm.validate(valid => {
+        if (valid) {
+          this.loading_register = true;
+          registerUser(this.registerForm).then(response => {
+              if (response.code === 200) {
+                this.msgSuccess("注册成功");
+                this.registerShow = false;
+                this.open = true;
+              }
+              this.loading_register = false;
+          });
         }
       });
     },

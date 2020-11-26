@@ -7,16 +7,17 @@ import { getToken } from '@/utils/auth'
 
 NProgress.configure({ showSpinner: false })
 
-const whiteList = ['/login', '/auth-redirect', '/bind', '/register','/tool','/sst/login']
+const whiteList = ['/login', '/auth-redirect', '/bind', '/register','/tool','/sst/login','/input/article/preview','/input/product/preview']
 
 router.beforeEach((to, from, next) => {
+  console.log(to.path);
   NProgress.start()
   if (getToken()) {
     /* has token*/
     if (to.path === '/login') {
       next({ path: '/' })
       NProgress.done()
-    } else if(to.path.startsWith('/profile/upload')){
+    } else if(to.path.startsWith('/profile/upload') || to.path.startsWith('/tool') || to.path.indexOf('preview') !== -1){
       next();
     }else {
       if (store.getters.roles.length === 0) {
