@@ -102,6 +102,9 @@ public class MybatisDataAuthInterceptor implements Interceptor,ApplicationContex
 			if(mapperMap == null || !mapperMap.containsKey(mapperName) || SecurityUtils.getAuthentication() == null) {
 				return invocation.proceed();
 			}
+			if("anonymousUser".equals(SecurityUtils.getAuthentication().getPrincipal())) {
+				return invocation.proceed();
+			}
 			Map<String, DataAuth> authMap = CacheUtils.getCache(StaticCode.DATA_AUTH_MAP);
 			
 			SysUser sysUser = SecurityUtils.getLoginUser().getUser();

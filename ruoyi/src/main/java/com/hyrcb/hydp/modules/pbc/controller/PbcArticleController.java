@@ -93,7 +93,7 @@ public class PbcArticleController extends BaseController {
     /**
      * 获取文章信息详细信息
      */
-    @PreAuthorize("@ss.hasPermi('pbc:article:query')" )
+//    @PreAuthorize("@ss.hasPermi('pbc:article:query')" )
     @GetMapping(value = "/{id}" )
     public AjaxResult getInfo(@PathVariable("id" ) Long id) {
         return AjaxResult.success(iPbcArticleService.getById(id));

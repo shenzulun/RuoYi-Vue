@@ -90,7 +90,7 @@ public class PbcLoanProductController extends BaseController {
     /**
      * 获取贷款产品详细信息
      */
-    @PreAuthorize("@ss.hasPermi('pbc:product:query')" )
+//    @PreAuthorize("@ss.hasPermi('pbc:product:query')" )
     @GetMapping(value = "/{id}" )
     public AjaxResult getInfo(@PathVariable("id" ) Long id) {
         return AjaxResult.success(iPbcLoanProductService.getById(id));
