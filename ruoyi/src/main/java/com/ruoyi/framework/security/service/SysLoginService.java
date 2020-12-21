@@ -17,6 +17,7 @@ import com.ruoyi.framework.manager.AsyncManager;
 import com.ruoyi.framework.manager.factory.AsyncFactory;
 import com.ruoyi.framework.redis.RedisCache;
 import com.ruoyi.framework.security.LoginUser;
+import com.ruoyi.project.system.service.ISysConfigService;
 
 /**
  * 登录校验方法
@@ -34,6 +35,9 @@ public class SysLoginService
 
     @Autowired
     private RedisCache redisCache;
+    
+    @Autowired
+    private ISysConfigService configService;
 
     /**
      * 登录验证
@@ -46,21 +50,24 @@ public class SysLoginService
      */
     public String login(String username, String password, String code, String uuid)
     {
-    	/** shenzl-20200706-去除验证码
-        String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
-        String captcha = redisCache.getCacheObject(verifyKey);
-        redisCache.deleteObject(verifyKey);
-        if (captcha == null)
-        {
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire")));
-            throw new CaptchaExpireException();
-        }
-        if (!code.equalsIgnoreCase(captcha))
-        {
-            AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
-            throw new CaptchaException();
-        }
-        */
+    	/** shenzl-20200706-去除验证码 */
+    	// 判断是否开启验证码
+    	String flag = configService.selectConfigByKey("sys.switch.authcode");
+    	if("on".equals(flag)) {
+    		String verifyKey = Constants.CAPTCHA_CODE_KEY + uuid;
+            String captcha = redisCache.getCacheObject(verifyKey);
+            redisCache.deleteObject(verifyKey);
+            if (captcha == null)
+            {
+                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire")));
+                throw new CaptchaExpireException();
+            }
+            if (!code.equalsIgnoreCase(captcha))
+            {
+                AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error")));
+                throw new CaptchaException();
+            }
+    	}
         // 用户验证
         Authentication authentication = null;
         try

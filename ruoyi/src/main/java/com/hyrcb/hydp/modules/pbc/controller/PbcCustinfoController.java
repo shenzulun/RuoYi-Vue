@@ -3,6 +3,7 @@ package com.hyrcb.hydp.modules.pbc.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.util.List;
 import java.util.Arrays;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,12 @@ public class PbcCustinfoController extends BaseController {
     public TableDataInfo list(PbcCustinfo pbcCustinfo){
         startPage();
         LambdaQueryWrapper<PbcCustinfo> lqw = new LambdaQueryWrapper<PbcCustinfo>();
+        // 判断是否管理员
+        Long deptId = SecurityUtils.getLoginUser().getUser().getDeptId();
+        if(deptId > 103) {
+        	// 非管理员只能查看本部门
+        	lqw.eq(PbcCustinfo::getCreateUser, SecurityUtils.getUsername());
+        }
         if (StringUtils.isNotBlank(pbcCustinfo.getCustNo())){
             lqw.eq(PbcCustinfo::getCustNo ,pbcCustinfo.getCustNo());
         }

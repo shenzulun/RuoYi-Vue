@@ -3,6 +3,8 @@ package com.hyrcb.hydp.modules.pbc.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.util.List;
 import java.util.Arrays;
+
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
+import com.hyrcb.hydp.modules.pbc.domain.PbcArticle;
 import com.hyrcb.hydp.modules.pbc.domain.PbcLoanProduct;
 import com.hyrcb.hydp.modules.pbc.service.IPbcLoanProductService;
 import com.ruoyi.framework.web.controller.BaseController;
@@ -49,9 +52,15 @@ public class PbcLoanProductController extends BaseController {
     public TableDataInfo list(PbcLoanProduct pbcLoanProduct){
         startPage();
         LambdaQueryWrapper<PbcLoanProduct> lqw = new LambdaQueryWrapper<PbcLoanProduct>();
-        if (pbcLoanProduct.getDeptId() != null && pbcLoanProduct.getDeptId() != 0L){
-            lqw.eq(PbcLoanProduct::getDeptId ,pbcLoanProduct.getDeptId());
+        // 判断是否管理员
+        Long deptId = SecurityUtils.getLoginUser().getUser().getDeptId();
+        if(deptId > 103) {
+        	// 非管理员只能查看本部门
+        	lqw.eq(PbcLoanProduct::getDeptId, deptId);
         }
+//        if (pbcLoanProduct.getDeptId() != null && pbcLoanProduct.getDeptId() != 0L){
+//            lqw.eq(PbcLoanProduct::getDeptId ,pbcLoanProduct.getDeptId());
+//        }
         if (StringUtils.isNotBlank(pbcLoanProduct.getProductType())){
             lqw.eq(PbcLoanProduct::getProductType ,pbcLoanProduct.getProductType());
         }

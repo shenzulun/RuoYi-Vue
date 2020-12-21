@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 import java.util.List;
 import java.util.Arrays;
+
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.framework.aspectj.lang.annotation.Log;
 import com.ruoyi.framework.aspectj.lang.enums.BusinessType;
 import com.hyrcb.hydp.modules.pbc.domain.PbcBankinfo;
+import com.hyrcb.hydp.modules.pbc.domain.PbcLoanProduct;
 import com.hyrcb.hydp.modules.pbc.service.IPbcBankinfoService;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
@@ -50,6 +53,12 @@ public class PbcBankinfoController extends BaseController {
     public TableDataInfo list(PbcBankinfo pbcBankinfo){
         startPage();
         LambdaQueryWrapper<PbcBankinfo> lqw = new LambdaQueryWrapper<PbcBankinfo>();
+        // 判断是否管理员
+        Long deptId = SecurityUtils.getLoginUser().getUser().getDeptId();
+        if(deptId > 103) {
+        	// 非管理员只能查看本部门
+        	lqw.eq(PbcBankinfo::getDeptId, deptId);
+        }
         if (StringUtils.isNotBlank(pbcBankinfo.getBankId())){
             lqw.eq(PbcBankinfo::getBankId ,pbcBankinfo.getBankId());
         }

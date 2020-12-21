@@ -3,6 +3,8 @@ package com.hyrcb.hydp.modules.pbc.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import java.util.List;
 import java.util.Arrays;
+
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,38 @@ public class PbcArticleController extends BaseController {
     @DataAuth(method="dept_id=?")
     @GetMapping("/list")
     public TableDataInfo list(PbcArticle pbcArticle){
+        startPage();
+        LambdaQueryWrapper<PbcArticle> lqw = new LambdaQueryWrapper<PbcArticle>();
+        // 判断是否管理员
+        Long deptId = SecurityUtils.getLoginUser().getUser().getDeptId();
+        if(deptId > 103) {
+        	// 非管理员只能查看本部门
+        	lqw.eq(PbcArticle::getDeptId, deptId);
+        }
+//        if (pbcArticle.getDeptId() != null && pbcArticle.getDeptId() != 0L){
+//            lqw.eq(PbcArticle::getDeptId ,pbcArticle.getDeptId());
+//        }
+        if (StringUtils.isNotBlank(pbcArticle.getArticleType())){
+            lqw.eq(PbcArticle::getArticleType ,pbcArticle.getArticleType());
+        }
+        if (StringUtils.isNotBlank(pbcArticle.getTitle())){
+            lqw.like(PbcArticle::getTitle ,pbcArticle.getTitle());
+        }
+        if (StringUtils.isNotBlank(pbcArticle.getContent())){
+            lqw.like(PbcArticle::getContent ,pbcArticle.getContent());
+        }
+        List<PbcArticle> list = iPbcArticleService.list(lqw);
+        format(list);
+        return getDataTable(list);
+    }
+    
+    /**
+     * 查询文章信息列表
+     */
+    @PreAuthorize("@ss.hasPermi('pbc:article:list')")
+    @DataAuth(method="dept_id=?")
+    @GetMapping("/listAll")
+    public TableDataInfo listAll(PbcArticle pbcArticle){
         startPage();
         LambdaQueryWrapper<PbcArticle> lqw = new LambdaQueryWrapper<PbcArticle>();
         if (pbcArticle.getDeptId() != null && pbcArticle.getDeptId() != 0L){

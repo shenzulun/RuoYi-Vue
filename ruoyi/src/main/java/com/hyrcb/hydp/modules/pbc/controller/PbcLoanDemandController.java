@@ -3,7 +3,10 @@ package com.hyrcb.hydp.modules.pbc.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Arrays;
+
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +26,13 @@ import com.hyrcb.hydp.modules.pbc.domain.PbcLoanDemand;
 import com.hyrcb.hydp.modules.pbc.service.IPbcBankinfoService;
 import com.hyrcb.hydp.modules.pbc.service.IPbcCustinfoService;
 import com.hyrcb.hydp.modules.pbc.service.IPbcLoanDemandService;
+import com.jfinal.plugin.activerecord.Db;
+import com.jfinal.plugin.activerecord.Record;
 import com.ruoyi.framework.web.controller.BaseController;
 import com.ruoyi.framework.web.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.framework.web.page.TableDataInfo;
+import com.ruoyi.project.system.domain.SysUser;
 
 /**
  * 企业融资需求Controller
@@ -56,6 +62,47 @@ public class PbcLoanDemandController extends BaseController {
     public TableDataInfo list(PbcLoanDemand pbcLoanDemand){
         startPage();
         LambdaQueryWrapper<PbcLoanDemand> lqw = new LambdaQueryWrapper<PbcLoanDemand>();
+        // 判断是否管理员
+        SysUser sysUser = SecurityUtils.getLoginUser().getUser();
+        Long deptId = sysUser.getDeptId();
+        if(deptId > 103) {
+        	// 非管理员只能查看本部门
+        	// 判断当前登录角色
+        	String userName = SecurityUtils.getUsername();
+        	Long parentDeptId = sysUser.getDept().getParentId();
+        	if(parentDeptId == 203) {
+        		// 银行
+        		// 查询行号
+        		List<Record> bankList = Db.find("SELECT bank_no FROM pbc_bankinfo t1 where dept_id=?", deptId);
+        		if(bankList == null || bankList.size() == 0) {
+        			// 当前机构下无银行
+        			lqw.and(i -> i.isNull(PbcLoanDemand::getSolveBankNo)
+        					.or().eq(PbcLoanDemand::getCreateUser, userName)
+        					.or().eq(PbcLoanDemand::getUpdateUser, userName));
+        		}else {
+        			List<String> bankList1 = new ArrayList<>();
+        			for(Record r : bankList) {
+        				bankList1.add(r.getStr("bank_no"));
+        			}
+        			lqw.and(i -> i.isNull(PbcLoanDemand::getSolveBankNo)
+        					.or().in(PbcLoanDemand::getSolveBankNo, bankList)
+        					.or().eq(PbcLoanDemand::getCreateUser, userName)
+        					.or().eq(PbcLoanDemand::getUpdateUser, userName));
+        		}
+        	}else if(parentDeptId == 204) {
+        		// 企业
+        		// 查询客户号
+        		Record r = Db.findFirst("select cust_no from pbc_custinfo t1 where cust_name=?", sysUser.getNickName());
+        		if(r == null) {
+        			lqw.and(i -> i.eq(PbcLoanDemand::getCreateUser, userName)
+        					.or().eq(PbcLoanDemand::getUpdateUser, userName));
+        		}else {
+        			lqw.and(i -> i.eq(PbcLoanDemand::getCustNo, r.getStr("cust_no"))
+        					.or().eq(PbcLoanDemand::getCreateUser, userName)
+        					.or().eq(PbcLoanDemand::getUpdateUser, userName));
+        		}
+        	}
+        }
         if (StringUtils.isNotBlank(pbcLoanDemand.getDemandNo())){
             lqw.eq(PbcLoanDemand::getDemandNo ,pbcLoanDemand.getDemandNo());
         }
@@ -67,6 +114,9 @@ public class PbcLoanDemandController extends BaseController {
         }
         if (StringUtils.isNotBlank(pbcLoanDemand.getSolveBankNo())){
             lqw.eq(PbcLoanDemand::getSolveBankNo ,pbcLoanDemand.getSolveBankNo());
+        }
+        if (StringUtils.isNotBlank(pbcLoanDemand.getStatus())){
+            lqw.eq(PbcLoanDemand::getStatus ,pbcLoanDemand.getStatus());
         }
         List<PbcLoanDemand> list = iPbcLoanDemandService.list(lqw);
         for(PbcLoanDemand pbc : list) {
@@ -143,5 +193,18 @@ public class PbcLoanDemandController extends BaseController {
     @DeleteMapping("/{ids}" )
     public AjaxResult remove(@PathVariable Long[] ids) {
         return toAjax(iPbcLoanDemandService.removeByIds(Arrays.asList(ids)) ? 1 : 0);
+    }
+    
+    /**
+     * 请求协助
+     */
+    @PreAuthorize("@ss.hasPermi('pbc:demand:edit')" )
+    @Log(title = "企业融资需求" , businessType = BusinessType.UPDATE)
+    @PostMapping(value = "/help/{id}" )
+    public AjaxResult needHelp(@PathVariable("id" ) Long id) {
+    	if(id != null) {
+    		Db.update("update pbc_loan_demand set status='2' where id=?", id);
+    	}
+        return AjaxResult.success();
     }
 }
